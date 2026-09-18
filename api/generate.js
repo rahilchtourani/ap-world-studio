@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
     res.status(500).json({ error: 'Server is missing GEMINI_API_KEY. Add it in Vercel → Settings → Environment Variables, then redeploy.' });
     return;
   }
-  const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   try {
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch (_) { body = {}; } }
