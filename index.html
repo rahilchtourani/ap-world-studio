@@ -1,0 +1,987 @@
+<meta charset="utf-8" />
+<title>Sourcebook Studio</title>
+<meta name="description" content="Turn AP World History readings into classroom-ready materials." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js"></script>
+
+<style>
+:root{
+  --ground:#eef1f5; --surface:#ffffff; --surface-2:#f4f6f9; --surface-3:#e9edf2;
+  --ink:#15212e; --ink-soft:#516072; --ink-faint:#8493a3;
+  --line:#d7dee7; --line-soft:#e4e9f0;
+  --primary:#1c3d5a; --primary-ink:#14304a; --primary-soft:#e5edf5; --on-primary:#ffffff;
+  --accent:#a9781f;
+  --flash:#b5641b; --flash-soft:#f7ebdd;
+  --work:#12766a; --work-soft:#dcefec;
+  --quiz:#7a3f8f; --quiz-soft:#efe3f3;
+  --vocab:#2c7a44; --vocab-soft:#dcefe1;
+  --guide:#28598f; --guide-soft:#e0eaf5;
+  --skill:#4b4fa6; --skill-soft:#e7e7f6;
+  --danger:#b23b3b;
+  --ring:#3f78ad;
+  --shadow:0 1px 2px rgba(20,35,52,.06), 0 8px 24px rgba(20,35,52,.07);
+  --shadow-sm:0 1px 2px rgba(20,35,52,.08);
+  --radius:14px; --radius-sm:9px;
+  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
+  --font-ui:'Public Sans',system-ui,-apple-system,sans-serif;
+  --font-hand:'Newsreader',Georgia,'Times New Roman',serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0e141b; --surface:#161f29; --surface-2:#1c2733; --surface-3:#243040;
+    --ink:#e8edf3; --ink-soft:#a6b4c2; --ink-faint:#6d7d8d;
+    --line:#2a3644; --line-soft:#222d3a;
+    --primary:#6ea6d6; --primary-ink:#cfe2f2; --primary-soft:#182636; --on-primary:#0e141b;
+    --accent:#d3a24a;
+    --flash:#d98f45; --flash-soft:#2a2016;
+    --work:#4bb7a7; --work-soft:#12241f;
+    --quiz:#c088d3; --quiz-soft:#241628;
+    --vocab:#5cbd75; --vocab-soft:#122417;
+    --guide:#6ba3dd; --guide-soft:#141f2c;
+    --skill:#9095e6; --skill-soft:#1a1b33;
+    --danger:#e08585;
+    --ring:#6ea6d6;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0e141b; --surface:#161f29; --surface-2:#1c2733; --surface-3:#243040;
+  --ink:#e8edf3; --ink-soft:#a6b4c2; --ink-faint:#6d7d8d;
+  --line:#2a3644; --line-soft:#222d3a;
+  --primary:#6ea6d6; --primary-ink:#cfe2f2; --primary-soft:#182636; --on-primary:#0e141b;
+  --accent:#d3a24a;
+  --flash:#d98f45; --flash-soft:#2a2016;
+  --work:#4bb7a7; --work-soft:#12241f;
+  --quiz:#c088d3; --quiz-soft:#241628;
+  --vocab:#5cbd75; --vocab-soft:#122417;
+  --guide:#6ba3dd; --guide-soft:#141f2c;
+  --skill:#9095e6; --skill-soft:#1a1b33;
+  --danger:#e08585;
+  --ring:#6ea6d6;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--font-ui); font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit}
+::selection{background:var(--primary-soft)}
+:focus-visible{outline:2px solid var(--ring); outline-offset:2px; border-radius:4px}
+
+/* ---------- header ---------- */
+.masthead{
+  display:flex; align-items:center; gap:16px;
+  padding:18px clamp(16px,4vw,40px);
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+}
+.brand{display:flex; align-items:center; gap:13px; min-width:0}
+.brand-mark{
+  width:42px; height:42px; flex:none; border-radius:11px;
+  background:linear-gradient(155deg,var(--primary),var(--primary-ink));
+  display:grid; place-items:center; color:var(--on-primary);
+  box-shadow:var(--shadow-sm);
+}
+.brand-mark svg{width:23px; height:23px}
+.brand-text h1{
+  font-family:var(--font-display); font-optical-sizing:auto;
+  font-weight:600; font-size:21px; line-height:1.05; margin:0; letter-spacing:-.01em;
+}
+.brand-text p{margin:2px 0 0; font-size:12.5px; color:var(--ink-soft)}
+.masthead-spacer{flex:1}
+.masthead-note{
+  font-size:12px; color:var(--ink-faint); text-align:right; max-width:230px;
+}
+.icon-btn{
+  width:38px; height:38px; flex:none; display:grid; place-items:center;
+  background:var(--surface-2); border:1px solid var(--line); color:var(--ink-soft);
+  border-radius:10px; cursor:pointer; transition:.15s;
+}
+.icon-btn:hover{color:var(--ink); border-color:var(--ink-faint)}
+.icon-btn svg{width:18px; height:18px}
+
+/* ---------- layout ---------- */
+.workspace{
+  display:grid; grid-template-columns:minmax(340px,420px) 1fr; gap:0;
+  align-items:stretch; min-height:calc(100vh - 79px);
+}
+.panel{
+  padding:clamp(18px,2.4vw,26px); border-right:1px solid var(--line);
+  background:var(--surface); overflow-y:auto;
+}
+.output-wrap{
+  padding:clamp(16px,2.4vw,30px);
+  background:
+    radial-gradient(circle at 1px 1px, var(--line-soft) 1px, transparent 0) 0 0/22px 22px,
+    var(--ground);
+  min-width:0;
+}
+@media (max-width:900px){
+  .workspace{grid-template-columns:1fr; min-height:auto}
+  .panel{border-right:none; border-bottom:1px solid var(--line)}
+}
+
+/* ---------- panel steps ---------- */
+.step{margin-bottom:26px}
+.step:last-child{margin-bottom:0}
+.step-head{display:flex; align-items:baseline; gap:9px; margin-bottom:11px}
+.step-num{
+  font-family:var(--font-display); font-weight:600; font-size:13px;
+  color:var(--on-primary); background:var(--primary);
+  width:22px; height:22px; border-radius:50%; display:grid; place-items:center;
+  flex:none; line-height:1;
+}
+.step-title{font-weight:600; font-size:14px; letter-spacing:.005em}
+.step-hint{font-size:12px; color:var(--ink-faint); margin:-4px 0 11px 31px}
+
+/* segmented */
+.seg{
+  display:inline-flex; background:var(--surface-2); border:1px solid var(--line);
+  border-radius:10px; padding:3px; gap:2px; width:100%;
+}
+.seg button{
+  flex:1; border:none; background:transparent; color:var(--ink-soft);
+  font-size:13px; font-weight:500; padding:7px 6px; border-radius:7px; cursor:pointer;
+  transition:.15s; white-space:nowrap;
+}
+.seg button[aria-pressed="true"]{
+  background:var(--surface); color:var(--ink); box-shadow:var(--shadow-sm); font-weight:600;
+}
+
+/* source */
+.src-pane{margin-top:12px}
+textarea#source{
+  width:100%; min-height:150px; resize:vertical; padding:12px 13px;
+  font-family:var(--font-ui); font-size:13.5px; line-height:1.55; color:var(--ink);
+  background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm);
+}
+textarea#source:focus{outline:none; border-color:var(--ring); background:var(--surface)}
+.dropzone{
+  margin-top:9px; border:1.5px dashed var(--line); border-radius:var(--radius-sm);
+  padding:11px 13px; display:flex; align-items:center; gap:10px;
+  font-size:12.5px; color:var(--ink-soft); cursor:pointer; transition:.15s; background:var(--surface-2);
+}
+.dropzone:hover,.dropzone.drag{border-color:var(--ring); color:var(--ink); background:var(--surface)}
+.dropzone svg{width:17px; height:17px; flex:none; color:var(--ink-faint)}
+.dropzone b{color:var(--ink); font-weight:600}
+.src-count{font-size:11.5px; color:var(--ink-faint); margin-top:7px; text-align:right}
+
+.field-label{display:block; font-size:12.5px; font-weight:600; margin:0 0 6px; color:var(--ink)}
+input[type=text].tinput,select.tinput,textarea.tinput{
+  width:100%; padding:9px 11px; font-family:var(--font-ui); font-size:13.5px; color:var(--ink); line-height:1.5;
+  background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm);
+}
+input[type=text].tinput:focus,select.tinput:focus,textarea.tinput:focus{outline:none; border-color:var(--ring); background:var(--surface)}
+select.tinput{appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238493a3' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>"); background-repeat:no-repeat; background-position:right 10px center; padding-right:32px}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
+.chip{
+  font-size:11.5px; padding:5px 10px; border-radius:20px; cursor:pointer;
+  background:var(--surface-2); border:1px solid var(--line); color:var(--ink-soft); transition:.15s;
+}
+.chip:hover{border-color:var(--ring); color:var(--ink)}
+
+/* material grid */
+.mat-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.mat-card{
+  display:flex; align-items:center; gap:10px; text-align:left;
+  padding:11px 12px; border-radius:var(--radius-sm); cursor:pointer;
+  background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
+  transition:.15s; font-family:inherit;
+}
+.mat-card:hover{border-color:var(--tint,var(--ring))}
+.mat-card[aria-pressed="true"]{
+  border-color:var(--tint); background:var(--tint-soft); box-shadow:inset 0 0 0 1px var(--tint);
+}
+.mat-ico{width:30px; height:30px; flex:none; border-radius:8px; display:grid; place-items:center; background:var(--tint-soft); color:var(--tint)}
+.mat-ico svg{width:17px; height:17px}
+.mat-card b{font-size:13px; font-weight:600; display:block; line-height:1.15}
+.mat-card span{font-size:11px; color:var(--ink-faint)}
+
+.opt-row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.opt-row .opt-field{min-width:0}
+
+.generate{
+  width:100%; margin-top:6px; padding:13px 16px; border:none; cursor:pointer;
+  background:var(--primary); color:var(--on-primary); border-radius:var(--radius-sm);
+  font-size:15px; font-weight:600; font-family:inherit; letter-spacing:.01em;
+  display:flex; align-items:center; justify-content:center; gap:9px; transition:.15s;
+  box-shadow:var(--shadow-sm);
+}
+.generate:hover:not(:disabled){filter:brightness(1.08)}
+.generate:disabled{opacity:.55; cursor:not-allowed}
+.generate svg{width:18px; height:18px}
+.consent-note{font-size:11.5px; color:var(--ink-faint); margin-top:9px; line-height:1.45; text-align:center}
+
+/* ---------- output ---------- */
+.out-bar{
+  display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;
+}
+.out-title{font-family:var(--font-display); font-weight:600; font-size:17px; margin:0; letter-spacing:-.01em}
+.out-title .badge{
+  font-family:var(--font-ui); font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  vertical-align:middle; margin-left:9px; padding:3px 8px; border-radius:20px;
+  background:var(--accent); color:#fff;
+}
+.out-actions{margin-left:auto; display:flex; gap:7px; flex-wrap:wrap}
+.obtn{
+  display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500;
+  padding:7px 12px; border-radius:8px; cursor:pointer; transition:.15s;
+  background:var(--surface); border:1px solid var(--line); color:var(--ink);
+}
+.obtn:hover{border-color:var(--ink-faint)}
+.obtn svg{width:15px; height:15px}
+.obtn.toggled{background:var(--primary-soft); border-color:var(--primary); color:var(--primary-ink)}
+.obtn:disabled{opacity:.45; cursor:not-allowed}
+
+/* the printable sheet */
+.sheet-scroll{max-width:820px}
+.sheet{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:clamp(24px,4vw,44px);
+  font-family:var(--font-hand); color:var(--ink);
+}
+.sheet-head{border-bottom:2.5px solid var(--tint,var(--primary)); padding-bottom:14px; margin-bottom:22px}
+.sheet-kicker{
+  font-family:var(--font-ui); font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--tint,var(--primary)); margin:0 0 5px;
+}
+.sheet-title{font-family:var(--font-display); font-weight:600; font-size:clamp(21px,3vw,27px); margin:0; line-height:1.12; letter-spacing:-.015em; text-wrap:balance}
+.sheet-meta{
+  display:flex; gap:26px; flex-wrap:wrap; margin-top:14px;
+  font-family:var(--font-ui); font-size:12.5px; color:var(--ink-soft);
+}
+.sheet-meta .line{display:flex; align-items:flex-end; gap:8px}
+.sheet-meta .rule{display:inline-block; width:130px; border-bottom:1px solid var(--ink-faint); height:15px}
+.sheet-instr{
+  font-family:var(--font-ui); font-size:13.5px; color:var(--ink-soft); background:var(--surface-2);
+  border-left:3px solid var(--tint,var(--primary)); padding:11px 14px; border-radius:0 8px 8px 0; margin:0 0 24px;
+}
+
+/* questions */
+.q{display:flex; gap:14px; margin-bottom:22px; break-inside:avoid}
+.q-num{
+  font-family:var(--font-ui); font-weight:700; font-size:14px; color:var(--tint,var(--primary));
+  flex:none; width:26px; text-align:right; padding-top:1px;
+}
+.q-body{flex:1; min-width:0}
+.q-prompt{font-size:16px; line-height:1.5; margin:0}
+.q-lines{margin-top:10px}
+.q-lines .wl{border-bottom:1px solid var(--line); height:26px}
+.q-choices{list-style:none; margin:11px 0 0; padding:0; font-size:15px}
+.q-choices li{display:flex; gap:10px; padding:4px 0; align-items:baseline}
+.q-choices .lt{font-family:var(--font-ui); font-weight:600; color:var(--ink-soft); flex:none}
+.q-choices li.correct{color:var(--vocab); font-weight:600}
+.q-choices li.correct .lt{color:var(--vocab)}
+
+/* flashcards grid */
+.cards{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.fc{
+  border:1px solid var(--line); border-radius:10px; overflow:hidden; break-inside:avoid;
+  display:flex; flex-direction:column; min-height:130px;
+}
+.fc-front{padding:14px 16px; font-family:var(--font-display); font-weight:600; font-size:16px; background:var(--tint-soft); color:var(--ink); border-bottom:1px dashed var(--tint)}
+.fc-back{padding:13px 16px; font-size:14px; line-height:1.5; color:var(--ink-soft); flex:1}
+.fc-tag{font-family:var(--font-ui); font-size:9.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--tint); display:block; margin-bottom:5px}
+
+/* vocab */
+.vocab-list{display:flex; flex-direction:column; gap:0}
+.vrow{display:grid; grid-template-columns:190px 1fr; gap:18px; padding:14px 0; border-bottom:1px solid var(--line-soft); break-inside:avoid}
+.vrow:last-child{border-bottom:none}
+.vterm{font-family:var(--font-display); font-weight:600; font-size:16px}
+.vdef{font-size:14.5px; line-height:1.5}
+.vsig{font-family:var(--font-ui); font-size:12.5px; color:var(--ink-soft); margin-top:5px; font-style:italic}
+@media (max-width:560px){.vrow{grid-template-columns:1fr; gap:5px}.cards{grid-template-columns:1fr}}
+
+/* skills sheet */
+.howto{font-family:var(--font-ui); font-size:13.5px; line-height:1.55; background:var(--tint-soft); border-radius:10px; padding:13px 16px; margin:0 0 22px}
+.howto .task-label{margin-bottom:5px}
+.src-excerpt{border:1px solid var(--line); border-left:3px solid var(--tint); border-radius:0 8px 8px 0; padding:14px 16px; margin:0 0 24px; font-size:15px; line-height:1.55; background:var(--surface-2)}
+.src-excerpt cite{display:block; font-family:var(--font-ui); font-size:12px; color:var(--ink-soft); margin-top:9px; font-style:normal}
+.task-label{font-family:var(--font-ui); font-weight:700; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--tint); display:block; margin-bottom:5px}
+
+/* study guide */
+.sg-overview{font-size:15px; line-height:1.55; margin:0 0 22px}
+.sg-eq{background:var(--tint-soft); border-radius:10px; padding:14px 16px; margin:0 0 24px}
+.sg-eq .lbl{font-family:var(--font-ui); font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--tint); display:block; margin-bottom:4px}
+.sg-eq p{margin:0; font-size:15.5px; font-style:italic}
+.sg-sec{margin-bottom:20px; break-inside:avoid}
+.sg-sec h3{font-family:var(--font-display); font-weight:600; font-size:17px; margin:0 0 8px}
+.sg-sec ul{margin:0; padding-left:20px}
+.sg-sec li{font-size:14.5px; line-height:1.55; margin-bottom:5px}
+.sg-cols{display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:26px; padding-top:20px; border-top:1px solid var(--line)}
+.sg-cols h4{font-family:var(--font-ui); font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--tint); margin:0 0 9px}
+.sg-terms{display:flex; flex-wrap:wrap; gap:6px}
+.sg-terms span{font-family:var(--font-ui); font-size:12.5px; padding:4px 10px; border-radius:20px; background:var(--surface-2); border:1px solid var(--line)}
+.sg-dates{list-style:none; margin:0; padding:0}
+.sg-dates li{display:flex; gap:11px; font-size:13.5px; margin-bottom:7px}
+.sg-dates .d{font-family:var(--font-ui); font-weight:700; color:var(--tint); flex:none; min-width:74px}
+@media (max-width:560px){.sg-cols{grid-template-columns:1fr}}
+
+/* answer key */
+.answerkey{margin-top:30px; padding-top:22px; border-top:2px dashed var(--tint,var(--primary)); break-before:page}
+.answerkey.hidden{display:none}
+.ak-title{font-family:var(--font-display); font-weight:600; font-size:18px; margin:0 0 16px; display:flex; align-items:center; gap:9px}
+.ak-title svg{width:19px;height:19px;color:var(--tint)}
+.ak-item{margin-bottom:12px; font-size:14px; line-height:1.5; break-inside:avoid}
+.ak-item .n{font-family:var(--font-ui); font-weight:700; color:var(--tint)}
+.ak-item .ans{font-family:var(--font-ui); font-weight:600}
+.ak-item .exp{color:var(--ink-soft); display:block; margin-top:2px; font-size:13px}
+
+/* states */
+.state{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  padding:60px 24px; color:var(--ink-soft); background:var(--surface);
+  border:1px dashed var(--line); border-radius:var(--radius); max-width:820px;
+}
+.state svg{width:34px; height:34px; color:var(--ink-faint); margin-bottom:14px}
+.state h3{font-family:var(--font-display); font-weight:600; color:var(--ink); font-size:18px; margin:0 0 6px}
+.state p{margin:0; font-size:13.5px; max-width:340px}
+.spinner{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{color:var(--danger)}
+.err svg{color:var(--danger)}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+/* ---------- print ---------- */
+@media print{
+  @page{margin:1.5cm}
+  body{background:#fff; color:#000; font-size:12pt}
+  .masthead,.panel,.out-bar,.no-print{display:none!important}
+  .workspace{display:block; min-height:0}
+  .output-wrap{padding:0; background:#fff}
+  .sheet-scroll{max-width:none}
+  .sheet{border:none; box-shadow:none; padding:0; border-radius:0; color:#000}
+  .sheet *{color:#000!important}
+  .fc-front{background:#f2f2f2!important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  .q-choices li.correct{font-weight:700}
+  .answerkey.hidden{display:none!important}
+}
+</style>
+
+<div class="masthead">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l6-2 8 2 6-2v14l-6 2-8-2-6 2z"/><path d="M8 4v14M16 6v14"/></svg>
+    </div>
+    <div class="brand-text">
+      <h1>Sourcebook Studio</h1>
+      <p>AP World History · readings in, materials out</p>
+    </div>
+  </div>
+  <div class="masthead-spacer"></div>
+  <div class="masthead-note no-print">Generates with your own Google Gemini key.</div>
+  <button class="icon-btn no-print" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">
+    <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</div>
+
+<div class="workspace">
+  <!-- ============ CONTROLS ============ -->
+  <section class="panel no-print" aria-label="Material controls">
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">1</span><span class="step-title">Choose your source</span></div>
+      <div class="seg" role="group" aria-label="Source mode">
+        <button id="modePaste" aria-pressed="true">Paste / upload a reading</button>
+        <button id="modeTopic" aria-pressed="false">Name a section</button>
+      </div>
+
+      <div style="margin-top:12px">
+        <label class="field-label" for="srcKind">What is this material?</label>
+        <select class="tinput" id="srcKind">
+          <option value="textbook" selected>Textbook / AMSCO section</option>
+          <option value="class">My class material (notes, slides, handout)</option>
+          <option value="primary">Primary source document</option>
+          <option value="secondary">Secondary source / article</option>
+          <option value="mixed">Mixed / other</option>
+        </select>
+      </div>
+
+      <div class="src-pane" id="panePaste">
+        <textarea id="source" placeholder="Paste a reading, primary source, or textbook section here…"></textarea>
+        <label class="dropzone" id="dropzone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5-5 5 5"/><path d="M12 5v13"/></svg>
+          <span>Drop a <b>.pdf</b> or <b>.txt</b> file, or <b>browse</b></span>
+          <input type="file" id="fileInput" accept=".txt,.md,.pdf,text/plain" hidden />
+        </label>
+        <div class="src-count" id="srcCount">0 words</div>
+      </div>
+
+      <div class="src-pane" id="paneTopic" hidden>
+        <label class="field-label" for="topic">Section, topic, or chapter</label>
+        <input type="text" class="tinput" id="topic" placeholder="e.g. AMSCO Unit 2.2 — The Mongol Empire" />
+        <div class="chips" id="topicChips">
+          <span class="chip">AMSCO Unit 2.2 — The Mongol Empire</span>
+          <span class="chip">AMSCO Unit 1.1 — Song Dynasty</span>
+          <span class="chip">Unit 4 — Maritime Empires</span>
+          <span class="chip">Columbian Exchange</span>
+        </div>
+        <div class="src-count" style="text-align:left;margin-top:9px">Claude builds from the standard content of that section — great for AMSCO chapters you don't have as a file.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">2</span><span class="step-title">What should I make?</span></div>
+      <div class="mat-grid" id="matGrid" role="group" aria-label="Material type"></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="step-num">3</span><span class="step-title">Fine-tune</span></div>
+      <div class="opt-row">
+        <div class="opt-field">
+          <label class="field-label" for="level">Reading level</label>
+          <select class="tinput" id="level">
+            <option value="scaffolded">Scaffolded (support)</option>
+            <option value="onlevel" selected>On-level</option>
+            <option value="rigor">Full AP rigor</option>
+          </select>
+        </div>
+        <div class="opt-field">
+          <label class="field-label" for="count" id="countLabel">How many</label>
+          <select class="tinput" id="count"></select>
+        </div>
+      </div>
+      <div id="skillWrap" hidden style="margin-top:12px">
+        <label class="field-label" for="skillFocus">Skill to practice</label>
+        <select class="tinput" id="skillFocus">
+          <option value="Sourcing & HIPP document analysis — Historical situation, Intended audience, Purpose, and Point of view">Sourcing &amp; HIPP analysis</option>
+          <option value="Causation — identifying causes and effects and evaluating their relative importance">Causation</option>
+          <option value="Comparison — identifying similarities and differences and explaining them">Comparison</option>
+          <option value="Continuity and change over time (CCOT)">Continuity &amp; change over time</option>
+          <option value="Contextualization — situating events in a broader historical setting">Contextualization</option>
+          <option value="Argumentation — writing a defensible thesis and supporting it with evidence">Argument &amp; thesis practice</option>
+        </select>
+      </div>
+      <div style="margin-top:12px">
+        <label class="field-label" for="focus">Tell Claude what to analyze or emphasize <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
+        <textarea class="tinput" id="focus" rows="2" style="resize:vertical" placeholder="e.g. Focus on AMSCO Unit 2.2 only · emphasize the Governance theme · make it about the Marco Polo excerpt"></textarea>
+      </div>
+    </div>
+
+    <button class="generate" id="generateBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l1.5 4L11 8.5 6.5 10 5 14l-1.5-4L-1 8.5 3.5 7z" transform="translate(3 1)"/><path d="M18 13l.9 2.4L21 16l-2.1.6L18 19l-.9-2.4L15 16l2.1-.6z"/></svg>
+    </button>
+    <div class="consent-note" id="consentNote">Materials are generated by Google Gemini using your own API key.</div>
+  </section>
+
+  <!-- ============ OUTPUT ============ -->
+  <section class="output-wrap" aria-label="Generated material" aria-live="polite">
+    <div class="out-bar no-print">
+      <h2 class="out-title" id="outTitle">Flashcards <span class="badge" id="exampleBadge">Example</span></h2>
+      <div class="out-actions">
+        <button class="obtn" id="answersBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>Show answer key</span></button>
+        <button class="obtn" id="regenBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg><span>Regenerate</span></button>
+        <button class="obtn" id="copyBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span></button>
+        <button class="obtn" id="exportBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6M9 15l3 3 3-3"/></svg><span>Export PDF</span></button>
+        <button class="obtn" id="printBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>Print</span></button>
+      </div>
+    </div>
+    <div class="sheet-scroll" id="outHost"></div>
+  </section>
+</div>
+
+<script>
+/* ---------------- config ---------------- */
+const ICON = {
+  flashcards:'<path d="M3 5h13v11H3z"/><path d="M8 8h13v11H8z" fill="none"/>',
+  worksheet:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
+  quiz:'<path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/>',
+  vocab:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  studyguide:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  skills:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/>',
+};
+const MATERIALS = {
+  flashcards:{label:'Flashcards', sub:'term ⇄ definition', tint:'var(--flash)', tintSoft:'var(--flash-soft)', unit:'cards', counts:[8,10,12,16,20], def:12, hasKey:false},
+  worksheet:{label:'Worksheet', sub:'reading questions', tint:'var(--work)', tintSoft:'var(--work-soft)', unit:'questions', counts:[4,5,6,8,10], def:6, hasKey:true},
+  quiz:{label:'Quiz', sub:'multiple choice', tint:'var(--quiz)', tintSoft:'var(--quiz-soft)', unit:'questions', counts:[5,8,10,12,15], def:10, hasKey:true},
+  vocab:{label:'Vocabulary', sub:'key terms list', tint:'var(--vocab)', tintSoft:'var(--vocab-soft)', unit:'terms', counts:[8,10,12,15,20], def:12, hasKey:false},
+  studyguide:{label:'Study guide', sub:'summary + review', tint:'var(--guide)', tintSoft:'var(--guide-soft)', unit:'sections', counts:[3,4,5,6], def:4, hasKey:false},
+  skills:{label:'Skills sheet', sub:'sourcing · HIPP · causation', tint:'var(--skill)', tintSoft:'var(--skill-soft)', unit:'prompts', counts:[3,4,5,6], def:4, hasKey:true},
+};
+const LEVEL_TEXT = {
+  scaffolded:'Grade 9-10 support level: shorter sentences, define hard terms in-line, clear structure, gentle scaffolding.',
+  onlevel:'On-level for a 10th-grade AP World History class: college-prep vocabulary, clear expectations.',
+  rigor:'Full AP rigor: college-level phrasing, demands analysis and use of historical reasoning (causation, comparison, continuity & change).',
+};
+
+/* ---------------- state ---------------- */
+let state = {
+  sourceMode:'paste',        // 'paste' | 'topic'
+  type:'flashcards',
+  showAnswers:false,
+  lastData:null,             // last generated data
+  isExample:true,
+};
+
+/* ---------------- theme ---------------- */
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click',()=>{
+  const cur = document.documentElement.getAttribute('data-theme');
+  const isDark = cur ? cur==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+  document.documentElement.setAttribute('data-theme', isDark?'light':'dark');
+});
+
+/* ---------------- helpers ---------------- */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const outHost = $('#outHost');
+
+function setTint(type){
+  const m = MATERIALS[type];
+  outHost.style.setProperty('--tint', m.tint);
+  outHost.style.setProperty('--tint-soft', m.tintSoft);
+}
+
+/* ---------------- build material picker ---------------- */
+const matGrid = $('#matGrid');
+Object.entries(MATERIALS).forEach(([key,m])=>{
+  const b = document.createElement('button');
+  b.className='mat-card'; b.dataset.type=key;
+  b.setAttribute('aria-pressed', key===state.type);
+  b.style.setProperty('--tint',m.tint); b.style.setProperty('--tint-soft',m.tintSoft);
+  b.innerHTML = `<span class="mat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICON[key]}</svg></span><span><b>${m.label}</b><span>${m.sub}</span></span>`;
+  b.addEventListener('click',()=>selectType(key));
+  matGrid.appendChild(b);
+});
+function selectType(key){
+  state.type = key;
+  [...matGrid.children].forEach(c=>c.setAttribute('aria-pressed', c.dataset.type===key));
+  $('#skillWrap').hidden = key!=='skills';
+  fillCounts();
+}
+function fillCounts(){
+  const m = MATERIALS[state.type];
+  const sel = $('#count');
+  sel.innerHTML = m.counts.map(n=>`<option value="${n}" ${n===m.def?'selected':''}>${n} ${m.unit}</option>`).join('');
+  $('#countLabel').textContent = 'How many ('+m.unit+')';
+}
+fillCounts();
+
+/* ---------------- source mode ---------------- */
+$('#modePaste').addEventListener('click',()=>setMode('paste'));
+$('#modeTopic').addEventListener('click',()=>setMode('topic'));
+function setMode(mode){
+  state.sourceMode = mode;
+  $('#modePaste').setAttribute('aria-pressed', mode==='paste');
+  $('#modeTopic').setAttribute('aria-pressed', mode==='topic');
+  $('#panePaste').hidden = mode!=='paste';
+  $('#paneTopic').hidden = mode!=='topic';
+}
+$('#topicChips').addEventListener('click',e=>{
+  if(e.target.classList.contains('chip')){ $('#topic').value = e.target.textContent; }
+});
+
+/* word count */
+const sourceEl = $('#source');
+sourceEl.addEventListener('input',updateCount);
+function updateCount(){
+  const w = sourceEl.value.trim().split(/\s+/).filter(Boolean).length;
+  $('#srcCount').textContent = w+' word'+(w===1?'':'s');
+}
+
+/* ---------------- file upload ---------------- */
+const dropzone = $('#dropzone'), fileInput = $('#fileInput');
+fileInput.addEventListener('change',e=>{ if(e.target.files[0]) readFile(e.target.files[0]); });
+['dragenter','dragover'].forEach(ev=>dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.remove('drag');}));
+dropzone.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) readFile(f); });
+
+async function readFile(file){
+  const cnt = $('#srcCount');
+  if(/\.pdf$/i.test(file.name) || file.type==='application/pdf'){
+    cnt.textContent='Reading PDF…';
+    try{
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+      let text='';
+      const max = Math.min(pdf.numPages, 40);
+      for(let i=1;i<=max;i++){
+        const page = await pdf.getPage(i);
+        const c = await page.getTextContent();
+        text += c.items.map(it=>it.str).join(' ')+'\n\n';
+      }
+      sourceEl.value = text.trim();
+      updateCount();
+      if(pdf.numPages>max) cnt.textContent += ' · first '+max+' pages';
+    }catch(err){
+      cnt.textContent='Could not read that PDF — try copy-pasting the text instead.';
+    }
+  }else{
+    const text = await file.text();
+    sourceEl.value = text;
+    updateCount();
+  }
+}
+
+/* ---------------- generation (calls our own server) ---------------- */
+async function callGenerate(prompt, tier){
+  let r;
+  try{
+    r = await fetch('/api/generate', {
+      method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify({ prompt, tier })
+    });
+  }catch(_){ throw {code:'network'}; }
+  let data = null;
+  try{ data = await r.json(); }catch(_){}
+  if(!r.ok){ throw {code:'server', status:r.status, message:(data && data.error) || ('Error '+r.status)}; }
+  return (data && data.text) || '';
+}
+function parseJson(text){
+  if(text && typeof text==='object') return text;
+  if(typeof text!=='string') throw {code:'invalid_json'};
+  try{ return JSON.parse(text); }catch(_){}
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if(fence){ try{ return JSON.parse(fence[1]); }catch(_){} }
+  const idxs = [text.indexOf('{'), text.indexOf('[')].filter(i=>i>=0);
+  const first = idxs.length ? Math.min(...idxs) : -1;
+  const last = Math.max(text.lastIndexOf('}'), text.lastIndexOf(']'));
+  if(first>=0 && last>first){ try{ return JSON.parse(text.slice(first,last+1)); }catch(_){} }
+  throw {code:'invalid_json'};
+}
+
+const SCHEMAS = {
+  flashcards:`{"cards":[{"front":"term, name, or question","back":"a clear, concise answer (1-2 sentences)"}]}`,
+  worksheet:`{"title":"worksheet title","instructions":"1-2 sentence directions for students","questions":[{"prompt":"the question","type":"short" or "extended","answer":"model answer / key points for the teacher"}]}`,
+  quiz:`{"title":"quiz title","questions":[{"stem":"the question (may reference the source)","choices":["option A","option B","option C","option D"],"answerIndex":0,"explanation":"why the answer is correct (1 sentence)"}]}`,
+  vocab:`{"terms":[{"term":"vocabulary term","definition":"student-friendly definition","significance":"why it matters in AP World / a concrete example"}]}`,
+  studyguide:`{"title":"study guide title","overview":"2-3 sentence big-picture summary","essentialQuestion":"one guiding question","sections":[{"heading":"theme or subtopic","points":["key point","key point"]}],"keyTerms":["term","term"],"keyDates":[{"date":"year or range","event":"what happened"}]}`,
+  skills:`{"title":"worksheet title","skill":"the skill being practiced","intro":"2-3 sentences teaching students, in plain language, how to do this skill","sourceExcerpt":"a short source excerpt or scenario for students to analyze — include one when the skill needs it (especially sourcing/HIPP); otherwise use an empty string","sourceCitation":"attribution for the excerpt (author, title, date), or empty string","tasks":[{"label":"short step name, e.g. Historical situation","prompt":"what the student should write or explain","sample":"a model answer for the teacher's key"}]}`,
+};
+
+const KIND_TEXT = {
+  textbook:'a textbook / AMSCO section',
+  class:'the teacher’s own class material (notes, slides, or a handout)',
+  primary:'a primary source document',
+  secondary:'a secondary source or article',
+  mixed:'mixed course material',
+};
+function buildPrompt(){
+  const count = $('#count').value;
+  const level = $('#level').value;
+  const focus = $('#focus').value.trim();
+  const srcKind = $('#srcKind').value;
+  const skill = $('#skillFocus').value;
+
+  let srcBlock;
+  if(state.sourceMode==='topic'){
+    const t = $('#topic').value.trim();
+    srcBlock = `The teacher wants to work from this AP World History section/topic (as covered in the AP curriculum and review books such as AMSCO): "${t}". This is ${KIND_TEXT[srcKind]}. Draw on the standard, historically accurate content of that section.`;
+  }else{
+    let src = sourceEl.value.trim();
+    if(src.length>14000) src = src.slice(0,14000);
+    srcBlock = `The following is ${KIND_TEXT[srcKind]}. Base the material ONLY on this source text:\n"""\n${src}\n"""`;
+  }
+
+  const kindLine = {
+    flashcards:`Create ${count} flashcards covering the most important people, events, terms, and concepts.`,
+    worksheet:`Create a reading worksheet with ${count} questions that check comprehension and push analysis. Mix short-answer and 1-2 extended-response questions.`,
+    quiz:`Create a ${count}-question multiple-choice quiz in AP World History style. Each question has exactly 4 plausible choices with one correct answer.`,
+    vocab:`Create a vocabulary list of the ${count} most important terms.`,
+    studyguide:`Create a study guide organized into about ${count} sections, plus key terms and key dates.`,
+    skills:`Create a scaffolded skills-practice worksheet that teaches students the historical-thinking skill of: ${skill}. Begin with a brief student-friendly explanation of the skill. When the skill needs a document to work with (especially sourcing/HIPP), include one short, historically accurate source excerpt or scenario drawn from the material, with an attribution. Then give ${count} scaffolded tasks that walk students through applying the skill step by step, each with a model answer for the teacher.`,
+  }[state.type];
+
+  return [
+    `You are helping a teaching assistant prepare classroom materials for a high-school AP World History: Modern course (c. 1200 CE to present).`,
+    kindLine,
+    srcBlock,
+    `Reading level: ${LEVEL_TEXT[level]}`,
+    focus ? `Special instructions from the teacher — follow these carefully: ${focus}.` : '',
+    `Respond with ONLY valid JSON in exactly this shape, no markdown or commentary:`,
+    SCHEMAS[state.type],
+  ].filter(Boolean).join('\n\n');
+}
+
+const generateBtn = $('#generateBtn');
+generateBtn.addEventListener('click',()=>generate(false));
+$('#regenBtn').addEventListener('click',()=>generate(true));
+
+function setBusy(b){
+  generateBtn.disabled=b;
+  $('#regenBtn').disabled = b || !state.lastData;
+  generateBtn.innerHTML = b
+    ? '<span class="spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Generating…'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4l1.5 4L14 9.5 9.5 11 8 15l-1.5-4L2 9.5 6.5 8z"/><path d="M18 13l.9 2.4L21 16l-2.1.6L18 19l-.9-2.4L15 16l2.1-.6z"/></svg> Generate '+MATERIALS[state.type].label.toLowerCase();
+}
+setBusy(false);
+
+async function generate(refresh){
+  // validate source
+  if(state.sourceMode==='paste' && sourceEl.value.trim().length<40){
+    showState('err','Add some source text','Paste a reading (a paragraph or more), upload a file, or switch to "Name a section".');
+    return;
+  }
+  if(state.sourceMode==='topic' && $('#topic').value.trim().length<3){
+    showState('err','Name a section','Type a topic or section, e.g. "AMSCO Unit 2.2 — The Mongol Empire".');
+    return;
+  }
+  const type = state.type;
+  setBusy(true);
+  showState('load','Writing your '+MATERIALS[type].label.toLowerCase()+'…','Gemini is reading the source and drafting. This usually takes 10–30 seconds.');
+
+  try{
+    const tier = (type==='quiz'||type==='worksheet'||type==='skills') ? 'complex' : 'default';
+    const text = await callGenerate(buildPrompt(), tier);
+    const data = parseJson(text);
+    state.lastData = data; state.isExample=false; state.type=type; state.showAnswers=false;
+    renderOutput(type, data, false);
+  }catch(e){
+    const msg = errCopy(e);
+    showState('err', msg.t, msg.d);
+  }finally{
+    setBusy(false);
+  }
+}
+
+function errCopy(e){
+  const code = e && e.code;
+  const m = (e && e.message) || '';
+  if(code==='server' && e.status===429) return {t:'Hit the free-tier limit',d:'Gemini’s free tier limits how often you can generate. Wait a minute, then try again.'};
+  if(/api[_ ]?key|api key|not valid|permission|unregistered|forbidden/i.test(m)) return {t:'API key problem',d:'Check that GEMINI_API_KEY is set correctly in your Vercel project settings, then redeploy and try again.'};
+  switch(code){
+    case 'network': return {t:'Couldn’t reach the generator',d:'Check your internet connection. If you just deployed, wait a moment and retry.'};
+    case 'invalid_json': return {t:'That didn’t come out right',d:'Click Regenerate, or shorten the source / reduce the count.'};
+    case 'server': return {t:'Generation error',d: m || 'Please try again in a moment.'};
+    default: return {t:'Something went wrong',d: m || 'Please try again.'};
+  }
+}
+
+/* ---------------- output shell ---------------- */
+function showState(kind,title,body){
+  const icon = kind==='load'
+    ? '<div class="spinner"></div>'
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${kind==='err'?'<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'}</svg>`;
+  outHost.innerHTML = `<div class="state ${kind==='err'?'err':''}">${icon}<h3>${esc(title)}</h3><p>${esc(body)}</p></div>`;
+  setOutBar(false);
+}
+function setOutBar(hasContent){
+  const m = MATERIALS[state.type];
+  $('#outTitle').innerHTML = m.label + (state.isExample ? ' <span class="badge">Example</span>':'');
+  $('#printBtn').disabled = !hasContent;
+  $('#exportBtn').disabled = !hasContent;
+  $('#copyBtn').disabled = !hasContent;
+  $('#regenBtn').disabled = !state.lastData;
+  const ab = $('#answersBtn');
+  ab.hidden = !(hasContent && m.hasKey);
+}
+
+function renderOutput(type, data, isExample){
+  state.type=type; state.isExample=isExample; state.lastData = isExample?state.lastData:data;
+  setTint(type);
+  let html='';
+  try{ html = RENDER[type](data); }
+  catch(err){ showState('err','Couldn’t display that','Try Regenerate.'); return; }
+  outHost.innerHTML = `<div class="sheet" id="sheet">${html}</div>`;
+  setOutBar(true);
+  applyAnswerVisibility();
+}
+
+function sheetHead(kicker, title, meta){
+  return `<div class="sheet-head">
+    <p class="sheet-kicker">${esc(kicker)}</p>
+    <h1 class="sheet-title">${esc(title)}</h1>
+    <div class="sheet-meta">
+      <span class="line">Name <span class="rule"></span></span>
+      <span class="line">Date <span class="rule" style="width:90px"></span></span>
+      <span class="line">Period <span class="rule" style="width:60px"></span></span>
+    </div>
+  </div>`;
+}
+
+/* ---------------- renderers ---------------- */
+const RENDER = {
+  flashcards(d){
+    const cards = d.cards||[];
+    return sheetHead('AP World History · Flashcards', d.title||'Study Flashcards')
+      + `<div class="cards">`+cards.map((c,i)=>`
+        <div class="fc"><div class="fc-front"><span class="fc-tag">Card ${i+1}</span>${esc(c.front)}</div><div class="fc-back">${esc(c.back)}</div></div>`).join('')+`</div>`;
+  },
+  worksheet(d){
+    const qs = d.questions||[];
+    const body = sheetHead('AP World History · Worksheet', d.title||'Reading Worksheet')
+      + (d.instructions?`<p class="sheet-instr">${esc(d.instructions)}</p>`:'')
+      + qs.map((q,i)=>{
+          const lines = q.type==='extended'?5:2;
+          return `<div class="q"><div class="q-num">${i+1}.</div><div class="q-body"><p class="q-prompt">${esc(q.prompt)}</p><div class="q-lines">${Array.from({length:lines}).map(()=>'<div class="wl"></div>').join('')}</div></div></div>`;
+        }).join('');
+    const key = `<div class="answerkey hidden" id="answerkey"><h2 class="ak-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7a4 4 0 1 0-4 4h9v3M11 11v6"/></svg>Answer Key</h2>`
+      + qs.map((q,i)=>`<div class="ak-item"><span class="n">${i+1}.</span> ${esc(q.answer||'—')}</div>`).join('')+`</div>`;
+    return body+key;
+  },
+  quiz(d){
+    const qs = d.questions||[];
+    const L=['A','B','C','D','E'];
+    const body = sheetHead('AP World History · Quiz', d.title||'Multiple-Choice Quiz')
+      + `<p class="sheet-instr">Choose the best answer for each question.</p>`
+      + qs.map((q,i)=>{
+          const ai = q.answerIndex;
+          const choices = (q.choices||[]).map((c,ci)=>`<li class="ans-choice" data-correct="${ci===ai}"><span class="lt">${L[ci]}.</span><span>${esc(c)}</span></li>`).join('');
+          return `<div class="q"><div class="q-num">${i+1}.</div><div class="q-body"><p class="q-prompt">${esc(q.stem)}</p><ul class="q-choices">${choices}</ul></div></div>`;
+        }).join('');
+    const key = `<div class="answerkey hidden" id="answerkey"><h2 class="ak-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7a4 4 0 1 0-4 4h9v3M11 11v6"/></svg>Answer Key</h2>`
+      + qs.map((q,i)=>`<div class="ak-item"><span class="n">${i+1}.</span> <span class="ans">${L[q.answerIndex]??'?'}</span>${q.explanation?`<span class="exp">${esc(q.explanation)}</span>`:''}</div>`).join('')+`</div>`;
+    return body+key;
+  },
+  vocab(d){
+    const terms = d.terms||[];
+    return sheetHead('AP World History · Vocabulary', d.title||'Key Terms')
+      + `<div class="vocab-list">`+terms.map(t=>`
+        <div class="vrow"><div class="vterm">${esc(t.term)}</div><div><div class="vdef">${esc(t.definition)}</div>${t.significance?`<div class="vsig">${esc(t.significance)}</div>`:''}</div></div>`).join('')+`</div>`;
+  },
+  skills(d){
+    const tasks=d.tasks||[];
+    const excerpt = (d.sourceExcerpt && d.sourceExcerpt.trim())
+      ? `<div class="src-excerpt">${esc(d.sourceExcerpt)}${d.sourceCitation?`<cite>— ${esc(d.sourceCitation)}</cite>`:''}</div>` : '';
+    const body = sheetHead('AP World History · Skills Practice', d.title||'Skills Practice')
+      + (d.intro?`<div class="howto"><span class="task-label">How to: ${esc(d.skill||'this skill')}</span>${esc(d.intro)}</div>`:'')
+      + excerpt
+      + tasks.map((t,i)=>`<div class="q"><div class="q-num">${i+1}.</div><div class="q-body"><span class="task-label">${esc(t.label||('Step '+(i+1)))}</span><p class="q-prompt">${esc(t.prompt)}</p><div class="q-lines">${Array.from({length:3}).map(()=>'<div class="wl"></div>').join('')}</div></div></div>`).join('');
+    const key = `<div class="answerkey hidden" id="answerkey"><h2 class="ak-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7a4 4 0 1 0-4 4h9v3M11 11v6"/></svg>Model Responses</h2>`
+      + tasks.map((t,i)=>`<div class="ak-item"><span class="n">${i+1}. ${esc(t.label||'')}</span> <span class="exp">${esc(t.sample||'—')}</span></div>`).join('')+`</div>`;
+    return body+key;
+  },
+  studyguide(d){
+    const secs=d.sections||[];
+    return sheetHead('AP World History · Study Guide', d.title||'Study Guide')
+      + (d.overview?`<p class="sg-overview">${esc(d.overview)}</p>`:'')
+      + (d.essentialQuestion?`<div class="sg-eq"><span class="lbl">Essential question</span><p>${esc(d.essentialQuestion)}</p></div>`:'')
+      + secs.map(s=>`<div class="sg-sec"><h3>${esc(s.heading)}</h3><ul>${(s.points||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul></div>`).join('')
+      + `<div class="sg-cols">
+          <div><h4>Key terms</h4><div class="sg-terms">${(d.keyTerms||[]).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>—</span>'}</div></div>
+          <div><h4>Key dates</h4><ul class="sg-dates">${(d.keyDates||[]).map(k=>`<li><span class="d">${esc(k.date)}</span><span>${esc(k.event)}</span></li>`).join('')||'<li>—</li>'}</ul></div>
+        </div>`;
+  },
+};
+
+/* ---------------- answer key toggle ---------------- */
+$('#answersBtn').addEventListener('click',()=>{
+  state.showAnswers = !state.showAnswers;
+  applyAnswerVisibility();
+});
+function applyAnswerVisibility(){
+  const key = document.getElementById('answerkey');
+  const btn = $('#answersBtn');
+  if(key) key.classList.toggle('hidden', !state.showAnswers);
+  document.querySelectorAll('.ans-choice').forEach(li=>{
+    li.classList.toggle('correct', state.showAnswers && li.dataset.correct==='true');
+  });
+  btn.classList.toggle('toggled', state.showAnswers);
+  btn.querySelector('span').textContent = state.showAnswers?'Hide answer key':'Show answer key';
+}
+
+/* ---------------- export to PDF ---------------- */
+function fileBase(){
+  const t = document.querySelector('#sheet .sheet-title');
+  const title = t ? t.textContent.trim() : MATERIALS[state.type].label;
+  return (MATERIALS[state.type].label+' - '+title)
+    .replace(/[\\/:*?"<>|\n\r]+/g,' ').replace(/\s+/g,' ').trim().slice(0,90) || 'AP World material';
+}
+function fallbackDownload(blob, name){
+  try{
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{a.remove(); URL.revokeObjectURL(url);}, 1500);
+  }catch(_){}
+}
+
+$('#exportBtn').addEventListener('click', exportPDF);
+async function exportPDF(){
+  const sheet = document.getElementById('sheet');
+  if(!sheet || !window.html2canvas || !window.jspdf) { window.print(); return; }
+  const btn = $('#exportBtn'), span = btn.querySelector('span'), orig = span.textContent;
+  btn.disabled = true; span.textContent = 'Exporting…';
+  // Render an off-screen, fixed-width, light-theme copy so the PDF is the
+  // same regardless of window size / dark mode.
+  const EXPORT_W = 760;
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-10000px;top:0;width:'+EXPORT_W+'px;background:#ffffff;padding:0;z-index:-1;';
+  wrap.style.setProperty('--tint', MATERIALS[state.type].tint);
+  wrap.style.setProperty('--tint-soft', MATERIALS[state.type].tintSoft);
+  const clone = sheet.cloneNode(true);
+  clone.style.width = EXPORT_W+'px';
+  clone.style.boxShadow = 'none';
+  clone.style.border = 'none';
+  const cak = clone.querySelector('#answerkey');
+  if(cak) cak.classList.toggle('hidden', !state.showAnswers);
+  wrap.appendChild(clone);
+  document.body.appendChild(wrap);
+  try{
+    const canvas = await html2canvas(wrap, {
+      backgroundColor:'#ffffff',
+      scale: 2,
+      useCORS:true,
+      windowWidth: 1200,
+      onclone:(doc)=>{ doc.documentElement.setAttribute('data-theme','light'); },
+    });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p','pt','letter');
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 40, usableW = pageW - margin*2, usableH = pageH - margin*2;
+    const imgW = usableW, imgH = canvas.height * (usableW / canvas.width);
+    const img = canvas.toDataURL('image/png');
+    let heightLeft = imgH, position = 0;
+    pdf.addImage(img,'PNG', margin, margin, imgW, imgH, undefined, 'FAST');
+    heightLeft -= usableH;
+    while(heightLeft > 0){
+      position -= usableH;
+      pdf.addPage();
+      pdf.addImage(img,'PNG', margin, margin + position, imgW, imgH, undefined, 'FAST');
+      heightLeft -= usableH;
+    }
+    const blob = pdf.output('blob');
+    const name = fileBase()+'.pdf';
+    fallbackDownload(blob, name);
+  }catch(err){
+    window.print(); // last-resort: browser's Save as PDF
+  }finally{
+    wrap.remove();
+    btn.disabled=false; span.textContent=orig;
+  }
+}
+
+/* ---------------- print & copy ---------------- */
+$('#printBtn').addEventListener('click',()=>window.print());
+$('#copyBtn').addEventListener('click',async()=>{
+  const sheet = document.getElementById('sheet');
+  if(!sheet) return;
+  const text = sheet.innerText.replace(/\n{3,}/g,'\n\n').trim();
+  try{ await navigator.clipboard.writeText(text);
+    const b=$('#copyBtn'); const s=b.querySelector('span'); const o=s.textContent; s.textContent='Copied!';
+    setTimeout(()=>s.textContent=o,1400);
+  }catch(_){}
+});
+
+/* ---------------- example on load ---------------- */
+const EXAMPLE_SOURCE = `The Mongol Empire, founded by Chinggis Khan in 1206, grew into the largest contiguous land empire in history. After a period of brutal conquest, the Mongols established a stretch of relative peace and stability across Eurasia known as the Pax Mongolica (c. 1250–1350). Under Mongol protection, the Silk Roads flourished: merchants, missionaries, and diplomats such as Marco Polo could travel from Europe to China with unusual safety. The Mongols standardized weights, ran a rapid relay messenger system (the yam), and encouraged trade by taxing it lightly. This connected world sped the exchange of goods, technologies (like gunpowder and the compass), and ideas — but the same trade routes also carried the bubonic plague westward, contributing to the Black Death of the 14th century.`;
+const EXAMPLE_CARDS = {title:'The Mongol Empire & Pax Mongolica', cards:[
+  {front:'Chinggis Khan',back:'Founder of the Mongol Empire in 1206; united the Mongol tribes and began the conquests that built the largest contiguous land empire in history.'},
+  {front:'Pax Mongolica',back:'The period of relative peace and stability across Eurasia (c. 1250–1350) that let trade and travel along the Silk Roads flourish under Mongol control.'},
+  {front:'The yam',back:'The Mongols’ rapid relay messenger and horse-station system that sped communication and administration across the empire.'},
+  {front:'Marco Polo',back:'A Venetian merchant who traveled the Silk Roads to China during the Pax Mongolica — an example of the era’s expanded long-distance travel.'},
+  {front:'Diffusion of technology',back:'Silk Road exchange spread innovations such as gunpowder and the magnetic compass from East to West.'},
+  {front:'The Black Death',back:'Bubonic plague carried westward along Mongol-era trade routes, causing catastrophic 14th-century population loss in Afro-Eurasia.'},
+]};
+
+function loadExample(){
+  sourceEl.value = EXAMPLE_SOURCE; updateCount();
+  selectType('flashcards');
+  state.isExample=true; state.lastData=EXAMPLE_CARDS;
+  renderOutput('flashcards', EXAMPLE_CARDS, true);
+  $('#regenBtn').disabled=false;
+}
+loadExample();
+</script>
