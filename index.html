@@ -483,6 +483,7 @@ select.tinput{appearance:none; background-image:url("data:image/svg+xml;utf8,<sv
         <button class="obtn" id="answersBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>Show answer key</span></button>
         <button class="obtn" id="regenBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></svg><span>Regenerate</span></button>
         <button class="obtn" id="copyBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy</span></button>
+        <button class="obtn" id="quizletBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 14.5h4"/></svg><span>Quizlet</span></button>
         <button class="obtn" id="exportBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6M9 15l3 3 3-3"/></svg><span>Export PDF</span></button>
         <button class="obtn" id="printBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>Print</span></button>
       </div>
@@ -775,6 +776,8 @@ function setOutBar(hasContent){
   $('#regenBtn').disabled = !state.lastData;
   const ab = $('#answersBtn');
   ab.hidden = !(hasContent && m.hasKey);
+  const qb = $('#quizletBtn');
+  qb.hidden = !(hasContent && (state.type==='flashcards' || state.type==='vocab'));
 }
 
 function renderOutput(type, data, isExample){
@@ -963,6 +966,37 @@ $('#copyBtn').addEventListener('click',async()=>{
     const b=$('#copyBtn'); const s=b.querySelector('span'); const o=s.textContent; s.textContent='Copied!';
     setTimeout(()=>s.textContent=o,1400);
   }catch(_){}
+});
+
+/* ---------------- Quizlet export ---------------- */
+// Build Quizlet's import format: term<TAB>definition, one card per line.
+function quizletTSV(){
+  const d = state.lastData || {};
+  const rows = [];
+  if(state.type==='flashcards' && Array.isArray(d.cards)){
+    d.cards.forEach(c=>{ if(c && c.front) rows.push([c.front, c.back||'']); });
+  }else if(state.type==='vocab' && Array.isArray(d.terms)){
+    d.terms.forEach(t=>{ if(t && t.term){ let def=t.definition||''; if(t.significance) def += ' — '+t.significance; rows.push([t.term, def]); } });
+  }
+  // Keep every card on its own line: no stray tabs/newlines inside a field.
+  return rows.map(r=>r.map(x=>String(x).replace(/[\t\r\n]+/g,' ').trim()).join('\t')).join('\n');
+}
+$('#quizletBtn').addEventListener('click', async ()=>{
+  const btn=$('#quizletBtn'), span=btn.querySelector('span'), orig=span.textContent;
+  const tsv = quizletTSV();
+  if(!tsv){ span.textContent='Nothing to export'; setTimeout(()=>span.textContent=orig,1600); return; }
+  let copied=false;
+  try{ await navigator.clipboard.writeText(tsv); copied=true; }catch(_){}
+  if(copied){
+    span.textContent='Copied — paste in Quizlet';
+    setTimeout(()=>span.textContent=orig, 2800);
+  }else{
+    // Clipboard blocked — hand over a .txt they can open and copy instead.
+    const blob = new Blob([tsv], {type:'text/plain'});
+    fallbackDownload(blob, fileBase()+' (Quizlet).txt');
+    span.textContent='Downloaded .txt';
+    setTimeout(()=>span.textContent=orig, 2800);
+  }
 });
 
 /* ---------------- example on load ---------------- */
