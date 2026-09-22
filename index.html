@@ -21,6 +21,7 @@
   --vocab:#2c7a44; --vocab-soft:#dcefe1;
   --guide:#28598f; --guide-soft:#e0eaf5;
   --skill:#4b4fa6; --skill-soft:#e7e7f6;
+  --exam:#9c3352; --exam-soft:#f6e3ea;
   --danger:#b23b3b;
   --ring:#3f78ad;
   --shadow:0 1px 2px rgba(20,35,52,.06), 0 8px 24px rgba(20,35,52,.07);
@@ -43,6 +44,7 @@
     --vocab:#5cbd75; --vocab-soft:#122417;
     --guide:#6ba3dd; --guide-soft:#141f2c;
     --skill:#9095e6; --skill-soft:#1a1b33;
+    --exam:#e084a0; --exam-soft:#2b1620;
     --danger:#e08585;
     --ring:#6ea6d6;
     --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
@@ -61,6 +63,7 @@
   --vocab:#5cbd75; --vocab-soft:#122417;
   --guide:#6ba3dd; --guide-soft:#141f2c;
   --skill:#9095e6; --skill-soft:#1a1b33;
+  --exam:#e084a0; --exam-soft:#2b1620;
   --danger:#e08585;
   --ring:#6ea6d6;
   --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
@@ -68,6 +71,7 @@
 }
 
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{
   margin:0; background:var(--ground); color:var(--ink);
@@ -309,6 +313,27 @@ select.tinput{appearance:none; background-image:url("data:image/svg+xml;utf8,<sv
 .src-excerpt cite{display:block; font-family:var(--font-ui); font-size:12px; color:var(--ink-soft); margin-top:9px; font-style:normal}
 .task-label{font-family:var(--font-ui); font-weight:700; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--tint); display:block; margin-bottom:5px}
 
+/* exam practice (SAQ / LEQ / DBQ) */
+.exam-q{margin-bottom:24px; break-inside:avoid}
+.exam-q-head{font-family:var(--font-ui); font-weight:700; font-size:13px; color:var(--tint); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--line-soft)}
+.exam-q-head span{font-weight:500; color:var(--ink-soft)}
+.exam-skill{font-family:var(--font-ui); font-size:13px; margin:0 0 16px}
+.leq-prompts{margin:0 0 18px; padding-left:24px}
+.leq-prompts li{font-size:16px; line-height:1.5; margin-bottom:14px; padding-left:6px}
+.q-lines.big .wl{height:30px}
+.dbq-prompt{font-family:var(--font-ui); font-size:15px; line-height:1.5; background:var(--tint-soft); border-radius:10px; padding:14px 16px; margin:0 0 18px}
+.dbq-prompt .task-label{margin-bottom:5px}
+.doc{border:1px solid var(--line); border-radius:10px; padding:13px 16px; margin:0 0 14px; break-inside:avoid}
+.doc-head{font-family:var(--font-ui); font-weight:700; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--tint); margin-bottom:5px}
+.doc-src{font-family:var(--font-ui); font-size:12px; color:var(--ink-soft); font-style:italic; margin-bottom:9px}
+.doc-body{font-size:15px; line-height:1.55}
+.rubric{border:1px solid var(--line); border-radius:8px; overflow:hidden; margin:0 0 16px}
+.rubric-row{display:grid; grid-template-columns:180px 1fr}
+.rubric-row:nth-child(odd){background:var(--surface-2)}
+.rubric-pt{font-family:var(--font-ui); font-weight:600; font-size:12.5px; padding:9px 12px; color:var(--tint); border-right:1px solid var(--line)}
+.rubric-cr{font-family:var(--font-ui); font-size:12.5px; padding:9px 12px; color:var(--ink-soft); line-height:1.45}
+@media (max-width:560px){.rubric-row{grid-template-columns:1fr}.rubric-pt{border-right:none; border-bottom:1px solid var(--line)}}
+
 /* study guide */
 .sg-overview{font-size:15px; line-height:1.55; margin:0 0 22px}
 .sg-eq{background:var(--tint-soft); border-radius:10px; padding:14px 16px; margin:0 0 24px}
@@ -463,8 +488,16 @@ select.tinput{appearance:none; background-image:url("data:image/svg+xml;utf8,<sv
           <option value="Argumentation — writing a defensible thesis and supporting it with evidence">Argument &amp; thesis practice</option>
         </select>
       </div>
+      <div id="examWrap" hidden style="margin-top:12px">
+        <label class="field-label" for="examFormat">Exam question format</label>
+        <select class="tinput" id="examFormat">
+          <option value="saq">SAQ — Short Answer (parts A, B, C)</option>
+          <option value="leq">LEQ — Long Essay (with rubric)</option>
+          <option value="dbq">DBQ — Document-Based (documents + rubric)</option>
+        </select>
+      </div>
       <div style="margin-top:12px">
-        <label class="field-label" for="focus">Tell Claude what to analyze or emphasize <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
+        <label class="field-label" for="focus">Tell the generator what to analyze or emphasize <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
         <textarea class="tinput" id="focus" rows="2" style="resize:vertical" placeholder="e.g. Focus on AMSCO Unit 2.2 only · emphasize the Governance theme · make it about the Marco Polo excerpt"></textarea>
       </div>
     </div>
@@ -501,6 +534,7 @@ const ICON = {
   vocab:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
   studyguide:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
   skills:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/>',
+  exam:'<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2 6 2s6-1 6-2v-5"/><path d="M22 10v5"/>',
 };
 const MATERIALS = {
   flashcards:{label:'Flashcards', sub:'term ⇄ definition', tint:'var(--flash)', tintSoft:'var(--flash-soft)', unit:'cards', counts:[8,10,12,16,20], def:12, hasKey:false},
@@ -509,6 +543,7 @@ const MATERIALS = {
   vocab:{label:'Vocabulary', sub:'key terms list', tint:'var(--vocab)', tintSoft:'var(--vocab-soft)', unit:'terms', counts:[8,10,12,15,20], def:12, hasKey:false},
   studyguide:{label:'Study guide', sub:'summary + review', tint:'var(--guide)', tintSoft:'var(--guide-soft)', unit:'sections', counts:[3,4,5,6], def:4, hasKey:false},
   skills:{label:'Skills sheet', sub:'sourcing · HIPP · causation', tint:'var(--skill)', tintSoft:'var(--skill-soft)', unit:'prompts', counts:[3,4,5,6], def:4, hasKey:true},
+  exam:{label:'Exam practice', sub:'SAQ · LEQ · DBQ', tint:'var(--exam)', tintSoft:'var(--exam-soft)', unit:'items', counts:[1,2,3], def:2, hasKey:true},
 };
 const LEVEL_TEXT = {
   scaffolded:'Grade 9-10 support level: shorter sentences, define hard terms in-line, clear structure, gentle scaffolding.',
@@ -559,15 +594,24 @@ function selectType(key){
   state.type = key;
   [...matGrid.children].forEach(c=>c.setAttribute('aria-pressed', c.dataset.type===key));
   $('#skillWrap').hidden = key!=='skills';
+  $('#examWrap').hidden = key!=='exam';
   fillCounts();
 }
 function fillCounts(){
   const m = MATERIALS[state.type];
   const sel = $('#count');
-  sel.innerHTML = m.counts.map(n=>`<option value="${n}" ${n===m.def?'selected':''}>${n} ${m.unit}</option>`).join('');
-  $('#countLabel').textContent = 'How many ('+m.unit+')';
+  let counts = m.counts, def = m.def, unit = m.unit;
+  if(state.type==='exam'){
+    const fmt = $('#examFormat') ? $('#examFormat').value : 'saq';
+    if(fmt==='saq'){ counts=[1,2,3]; def=2; unit='SAQ sets'; }
+    else if(fmt==='leq'){ counts=[1,2,3]; def=3; unit='prompt choices'; }
+    else { counts=[4,5,6,7]; def=6; unit='documents'; }
+  }
+  sel.innerHTML = counts.map(n=>`<option value="${n}" ${n===def?'selected':''}>${n} ${unit}</option>`).join('');
+  $('#countLabel').textContent = 'How many ('+unit+')';
 }
 fillCounts();
+$('#examFormat').addEventListener('change', fillCounts);
 
 /* ---------------- source mode ---------------- */
 $('#modePaste').addEventListener('click',()=>setMode('paste'));
@@ -660,6 +704,11 @@ const SCHEMAS = {
   studyguide:`{"title":"study guide title","overview":"2-3 sentence big-picture summary","essentialQuestion":"one guiding question","sections":[{"heading":"theme or subtopic","points":["key point","key point"]}],"keyTerms":["term","term"],"keyDates":[{"date":"year or range","event":"what happened"}]}`,
   skills:`{"title":"worksheet title","skill":"the skill being practiced","intro":"2-3 sentences teaching students, in plain language, how to do this skill","sourceExcerpt":"a short source excerpt or scenario for students to analyze — include one when the skill needs it (especially sourcing/HIPP); otherwise use an empty string","sourceCitation":"attribution for the excerpt (author, title, date), or empty string","tasks":[{"label":"short step name, e.g. Historical situation","prompt":"what the student should write or explain","sample":"a model answer for the teacher's key"}]}`,
 };
+const EXAM_SCHEMAS = {
+  saq:`{"format":"saq","title":"SAQ set title","stimulus":"a short primary- or secondary-source excerpt the questions refer to, or an empty string for a no-stimulus set","stimulusSource":"attribution for the stimulus (author, title, date), or an empty string","questions":[{"directions":"e.g. Use the excerpt to answer (a), (b), and (c).","parts":[{"label":"A","prompt":"an AP-style task using Identify / Describe / Explain","sample":"a model answer for the teacher's key"}]}]}`,
+  leq:`{"format":"leq","title":"LEQ title","reasoningSkill":"the targeted skill: Causation, Comparison, or Continuity and Change","directions":"one line of student directions","prompts":["prompt option 1","prompt option 2","prompt option 3"],"rubric":[{"row":"Thesis / Claim (1 pt)","criteria":"what earns the point"},{"row":"Contextualization (1 pt)","criteria":"..."},{"row":"Evidence (2 pts)","criteria":"..."},{"row":"Analysis & Reasoning (2 pts)","criteria":"..."}],"modelThesis":"a strong sample thesis for one prompt","suggestedEvidence":["a specific example a student could use","..."]}`,
+  dbq:`{"format":"dbq","title":"DBQ title","prompt":"the DBQ prompt (e.g. Evaluate the extent to which ...)","directions":"one line of student directions","documents":[{"number":1,"source":"attribution: author, title, date, and type of source","content":"a short, historically plausible excerpt of 2-4 sentences","hippNote":"a sourcing (HIPP) note for the teacher"}],"rubric":[{"row":"Thesis / Claim (1 pt)","criteria":"..."},{"row":"Contextualization (1 pt)","criteria":"..."},{"row":"Evidence from Documents (2 pts)","criteria":"..."},{"row":"Evidence Beyond Documents (1 pt)","criteria":"..."},{"row":"Sourcing / HIPP (1 pt)","criteria":"..."},{"row":"Complexity (1 pt)","criteria":"..."}],"modelThesis":"a sample thesis","suggestedGroupings":["a way the documents can be grouped"],"outsideEvidence":["a relevant outside fact a student could bring in"]}`,
+};
 
 const KIND_TEXT = {
   textbook:'a textbook / AMSCO section',
@@ -674,6 +723,7 @@ function buildPrompt(){
   const focus = $('#focus').value.trim();
   const srcKind = $('#srcKind').value;
   const skill = $('#skillFocus').value;
+  const examFormat = $('#examFormat').value;
 
   let srcBlock;
   if(state.sourceMode==='topic'){
@@ -692,6 +742,13 @@ function buildPrompt(){
     vocab:`Create a vocabulary list of the ${count} most important terms.`,
     studyguide:`Create a study guide organized into about ${count} sections, plus key terms and key dates.`,
     skills:`Create a scaffolded skills-practice worksheet that teaches students the historical-thinking skill of: ${skill}. Begin with a brief student-friendly explanation of the skill. When the skill needs a document to work with (especially sourcing/HIPP), include one short, historically accurate source excerpt or scenario drawn from the material, with an attribution. Then give ${count} scaffolded tasks that walk students through applying the skill step by step, each with a model answer for the teacher.`,
+    exam: (
+      examFormat==='saq'
+        ? `Create ${count} AP World History Short-Answer Question (SAQ) set(s). Each set uses AP command verbs (Identify, Describe, Explain) across parts (a), (b), and (c). Where it fits the content, include ONE short source stimulus (primary or secondary, with an attribution) that the parts refer to; otherwise leave the stimulus empty. Provide a concise model answer for each part in the teacher's key. No thesis is required for SAQs.`
+        : examFormat==='leq'
+        ? `Create an AP World History Long-Essay Question (LEQ) practice sheet with ${count} prompt option(s) the student chooses from, each targeting a historical reasoning skill (Causation, Comparison, or Continuity and Change). Include the official 6-point AP LEQ rubric (Thesis, Contextualization, Evidence, Analysis & Reasoning), a model thesis, and suggested specific evidence for the teacher.`
+        : `Create an AP World History Document-Based Question (DBQ) with a clear prompt and ${count} documents. Each document must have a realistic, varied source attribution and a short, historically plausible excerpt firmly grounded in the real history of this topic, with a range of points of view. Include the AP DBQ rubric rows and, for the teacher: a model thesis, suggested document groupings, a HIPP sourcing note per document, and outside evidence.`
+    ),
   }[state.type];
 
   return [
@@ -701,7 +758,7 @@ function buildPrompt(){
     `Reading level: ${LEVEL_TEXT[level]}`,
     focus ? `Special instructions from the teacher — follow these carefully: ${focus}.` : '',
     `Respond with ONLY valid JSON in exactly this shape, no markdown or commentary:`,
-    SCHEMAS[state.type],
+    state.type==='exam' ? EXAM_SCHEMAS[examFormat] : SCHEMAS[state.type],
   ].filter(Boolean).join('\n\n');
 }
 
@@ -733,7 +790,7 @@ async function generate(refresh){
   showState('load','Writing your '+MATERIALS[type].label.toLowerCase()+'…','Gemini is reading the source and drafting. This usually takes 10–30 seconds.');
 
   try{
-    const tier = (type==='quiz'||type==='worksheet'||type==='skills') ? 'complex' : 'default';
+    const tier = (type==='quiz'||type==='worksheet'||type==='skills'||type==='exam') ? 'complex' : 'default';
     const text = await callGenerate(buildPrompt(), tier);
     const data = parseJson(text);
     state.lastData = data; state.isExample=false; state.type=type; state.showAnswers=false;
@@ -804,6 +861,12 @@ function sheetHead(kicker, title, meta){
 }
 
 /* ---------------- renderers ---------------- */
+function akHead(label){
+  return `<h2 class="ak-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7a4 4 0 1 0-4 4h9v3M11 11v6"/></svg>${esc(label)}</h2>`;
+}
+function rubricRows(rubric){
+  return `<div class="rubric">`+(rubric||[]).map(r=>`<div class="rubric-row"><div class="rubric-pt">${esc(r.row||r.point||'')}</div><div class="rubric-cr">${esc(r.criteria||'')}</div></div>`).join('')+`</div>`;
+}
 const RENDER = {
   flashcards(d){
     const cards = d.cards||[];
@@ -865,6 +928,57 @@ const RENDER = {
           <div><h4>Key terms</h4><div class="sg-terms">${(d.keyTerms||[]).map(t=>`<span>${esc(t)}</span>`).join('')||'<span>—</span>'}</div></div>
           <div><h4>Key dates</h4><ul class="sg-dates">${(d.keyDates||[]).map(k=>`<li><span class="d">${esc(k.date)}</span><span>${esc(k.event)}</span></li>`).join('')||'<li>—</li>'}</ul></div>
         </div>`;
+  },
+  exam(d){
+    const fmt = d.format || ($('#examFormat') && $('#examFormat').value) || 'saq';
+    if(fmt==='leq') return RENDER._leq(d);
+    if(fmt==='dbq') return RENDER._dbq(d);
+    return RENDER._saq(d);
+  },
+  _saq(d){
+    const qs = d.questions||[];
+    const stim = (d.stimulus && d.stimulus.trim())
+      ? `<div class="src-excerpt">${esc(d.stimulus)}${d.stimulusSource?`<cite>— ${esc(d.stimulusSource)}</cite>`:''}</div>` : '';
+    const body = sheetHead('AP World History · Short-Answer Question', d.title||'Short-Answer Questions')
+      + `<p class="sheet-instr">Answer each part in complete sentences. A thesis is not required.</p>`
+      + stim
+      + qs.map((q,i)=>{
+          const parts = (q.parts||[]).map(p=>`<div class="q"><div class="q-num">${esc(p.label||'')})</div><div class="q-body"><p class="q-prompt">${esc(p.prompt)}</p><div class="q-lines">${Array.from({length:3}).map(()=>'<div class="wl"></div>').join('')}</div></div></div>`).join('');
+          return `<div class="exam-q"><div class="exam-q-head">Question ${i+1}${q.directions?` — <span>${esc(q.directions)}</span>`:''}</div>${parts}</div>`;
+        }).join('');
+    const key = `<div class="answerkey hidden" id="answerkey">${akHead('Model Responses')}`
+      + qs.map((q,i)=>`<div class="ak-item"><span class="n">Question ${i+1}</span></div>`+(q.parts||[]).map(p=>`<div class="ak-item"><span class="ans">${esc(p.label||'')})</span> <span class="exp">${esc(p.sample||'—')}</span></div>`).join('')).join('')
+      + `</div>`;
+    return body+key;
+  },
+  _leq(d){
+    const prompts = d.prompts||[];
+    const body = sheetHead('AP World History · Long-Essay Question', d.title||'Long-Essay Question')
+      + `<p class="sheet-instr">${esc(d.directions||'Answer ONE of the following in a full essay with a defensible thesis, contextualization, specific evidence, and analysis.')}</p>`
+      + (d.reasoningSkill?`<p class="exam-skill"><span class="task-label">Reasoning skill</span>${esc(d.reasoningSkill)}</p>`:'')
+      + `<ol class="leq-prompts">${prompts.map(p=>`<li>${esc(p)}</li>`).join('')}</ol>`
+      + `<div class="q-lines big">${Array.from({length:8}).map(()=>'<div class="wl"></div>').join('')}</div>`;
+    const key = `<div class="answerkey hidden" id="answerkey">${akHead('Scoring Guide & Model')}`
+      + rubricRows(d.rubric)
+      + (d.modelThesis?`<div class="ak-item"><span class="n">Model thesis</span> <span class="exp">${esc(d.modelThesis)}</span></div>`:'')
+      + (d.suggestedEvidence&&d.suggestedEvidence.length?`<div class="ak-item"><span class="n">Suggested evidence</span> <span class="exp">${d.suggestedEvidence.map(e=>esc(e)).join(' · ')}</span></div>`:'')
+      + `</div>`;
+    return body+key;
+  },
+  _dbq(d){
+    const docs = d.documents||[];
+    const body = sheetHead('AP World History · Document-Based Question', d.title||'Document-Based Question')
+      + (d.prompt?`<div class="dbq-prompt"><span class="task-label">Prompt</span>${esc(d.prompt)}</div>`:'')
+      + `<p class="sheet-instr">${esc(d.directions||'Using the documents and your knowledge of world history, write an essay with a thesis, contextualization, evidence from the documents, sourcing, and outside evidence.')}</p>`
+      + docs.map((doc,i)=>`<div class="doc"><div class="doc-head">Document ${esc(doc.number||i+1)}</div><div class="doc-src">${esc(doc.source||'')}</div><div class="doc-body">${esc(doc.content||'')}</div></div>`).join('');
+    const key = `<div class="answerkey hidden" id="answerkey">${akHead('Rubric & Teacher Notes')}`
+      + rubricRows(d.rubric)
+      + (d.modelThesis?`<div class="ak-item"><span class="n">Model thesis</span> <span class="exp">${esc(d.modelThesis)}</span></div>`:'')
+      + (d.suggestedGroupings&&d.suggestedGroupings.length?`<div class="ak-item"><span class="n">Suggested groupings</span> <span class="exp">${d.suggestedGroupings.map(e=>esc(e)).join(' · ')}</span></div>`:'')
+      + (d.outsideEvidence&&d.outsideEvidence.length?`<div class="ak-item"><span class="n">Outside evidence</span> <span class="exp">${d.outsideEvidence.map(e=>esc(e)).join(' · ')}</span></div>`:'')
+      + docs.map((doc,i)=>doc.hippNote?`<div class="ak-item"><span class="ans">Doc ${esc(doc.number||i+1)} — HIPP</span> <span class="exp">${esc(doc.hippNote)}</span></div>`:'').join('')
+      + `</div>`;
+    return body+key;
   },
 };
 
