@@ -705,7 +705,7 @@ const SCHEMAS = {
   skills:`{"title":"worksheet title","skill":"the skill being practiced","intro":"2-3 sentences teaching students, in plain language, how to do this skill","sourceExcerpt":"a short source excerpt or scenario for students to analyze — include one when the skill needs it (especially sourcing/HIPP); otherwise use an empty string","sourceCitation":"attribution for the excerpt (author, title, date), or empty string","tasks":[{"label":"short step name, e.g. Historical situation","prompt":"what the student should write or explain","sample":"a model answer for the teacher's key"}]}`,
 };
 const EXAM_SCHEMAS = {
-  saq:`{"format":"saq","title":"SAQ set title","stimulus":"a short primary- or secondary-source excerpt the questions refer to, or an empty string for a no-stimulus set","stimulusSource":"attribution for the stimulus (author, title, date), or an empty string","questions":[{"directions":"e.g. Use the excerpt to answer (a), (b), and (c).","parts":[{"label":"A","prompt":"an AP-style task using Identify / Describe / Explain","sample":"a model answer for the teacher's key"}]}]}`,
+  saq:`{"format":"saq","title":"overall title","questions":[{"stimulus":"a short source excerpt this question uses, or an empty string for a no-stimulus question","stimulusSource":"attribution for the excerpt (author, title, date), or an empty string","directions":"e.g. Use the excerpt to answer (a), (b), and (c).","parts":[{"label":"A","prompt":"an AP-style task using Identify / Describe / Explain","sample":"a model answer for the teacher's key"}]}]}`,
   leq:`{"format":"leq","title":"LEQ title","reasoningSkill":"the targeted skill: Causation, Comparison, or Continuity and Change","directions":"one line of student directions","prompts":["prompt option 1","prompt option 2","prompt option 3"],"rubric":[{"row":"Thesis / Claim (1 pt)","criteria":"what earns the point"},{"row":"Contextualization (1 pt)","criteria":"..."},{"row":"Evidence (2 pts)","criteria":"..."},{"row":"Analysis & Reasoning (2 pts)","criteria":"..."}],"modelThesis":"a strong sample thesis for one prompt","suggestedEvidence":["a specific example a student could use","..."]}`,
   dbq:`{"format":"dbq","title":"DBQ title","prompt":"the DBQ prompt (e.g. Evaluate the extent to which ...)","directions":"one line of student directions","documents":[{"number":1,"source":"attribution: author, title, date, and type of source","content":"a short, historically plausible excerpt of 2-4 sentences","hippNote":"a sourcing (HIPP) note for the teacher"}],"rubric":[{"row":"Thesis / Claim (1 pt)","criteria":"..."},{"row":"Contextualization (1 pt)","criteria":"..."},{"row":"Evidence from Documents (2 pts)","criteria":"..."},{"row":"Evidence Beyond Documents (1 pt)","criteria":"..."},{"row":"Sourcing / HIPP (1 pt)","criteria":"..."},{"row":"Complexity (1 pt)","criteria":"..."}],"modelThesis":"a sample thesis","suggestedGroupings":["a way the documents can be grouped"],"outsideEvidence":["a relevant outside fact a student could bring in"]}`,
 };
@@ -744,7 +744,7 @@ function buildPrompt(){
     skills:`Create a scaffolded skills-practice worksheet that teaches students the historical-thinking skill of: ${skill}. Begin with a brief student-friendly explanation of the skill. When the skill needs a document to work with (especially sourcing/HIPP), include one short, historically accurate source excerpt or scenario drawn from the material, with an attribution. Then give ${count} scaffolded tasks that walk students through applying the skill step by step, each with a model answer for the teacher.`,
     exam: (
       examFormat==='saq'
-        ? `Create ${count} AP World History Short-Answer Question (SAQ) set(s). Each set uses AP command verbs (Identify, Describe, Explain) across parts (a), (b), and (c). Where it fits the content, include ONE short source stimulus (primary or secondary, with an attribution) that the parts refer to; otherwise leave the stimulus empty. Provide a concise model answer for each part in the teacher's key. No thesis is required for SAQs.`
+        ? `Create ${count} AP World History Short-Answer Question(s) (SAQ). Return a SINGLE JSON object whose "questions" array has exactly ${count} element(s) — one per SAQ; do NOT wrap the whole result in an outer array. Each SAQ uses AP command verbs (Identify, Describe, Explain) across parts (a), (b), and (c). Where it fits the content, give that question a short source stimulus (with an attribution) the parts refer to; otherwise leave its stimulus empty. Provide a concise model answer for each part. No thesis is required.`
         : examFormat==='leq'
         ? `Create an AP World History Long-Essay Question (LEQ) practice sheet with ${count} prompt option(s) the student chooses from, each targeting a historical reasoning skill (Causation, Comparison, or Continuity and Change). Include the official 6-point AP LEQ rubric (Thesis, Contextualization, Evidence, Analysis & Reasoning), a model thesis, and suggested specific evidence for the teacher.`
         : `Create an AP World History Document-Based Question (DBQ) with a clear prompt and ${count} documents. Each document must have a realistic, varied source attribution and a short, historically plausible excerpt firmly grounded in the real history of this topic, with a range of points of view. Include the AP DBQ rubric rows and, for the teacher: a model thesis, suggested document groupings, a HIPP sourcing note per document, and outside evidence.`
@@ -936,22 +936,39 @@ const RENDER = {
     return RENDER._saq(d);
   },
   _saq(d){
-    const qs = d.questions||[];
-    const stim = (d.stimulus && d.stimulus.trim())
-      ? `<div class="src-excerpt">${esc(d.stimulus)}${d.stimulusSource?`<cite>— ${esc(d.stimulusSource)}</cite>`:''}</div>` : '';
-    const body = sheetHead('AP World History · Short-Answer Question', d.title||'Short-Answer Questions')
+    // Accept either a single object or an array of SAQ objects (the model
+    // sometimes returns one per requested set). Flatten to a list of items.
+    const arr = Array.isArray(d) ? d : [d];
+    let title = null; const items = [];
+    arr.forEach(obj=>{
+      if(!obj) return;
+      if(obj.title && !title) title = obj.title;
+      const qs = Array.isArray(obj.questions) ? obj.questions : [obj];
+      qs.forEach(q=>{
+        if(!q) return;
+        items.push({
+          stimulus: q.stimulus || obj.stimulus || '',
+          stimulusSource: q.stimulusSource || obj.stimulusSource || '',
+          directions: q.directions || obj.directions || '',
+          parts: Array.isArray(q.parts) ? q.parts : []
+        });
+      });
+    });
+    const body = sheetHead('AP World History · Short-Answer Question', title||'Short-Answer Questions')
       + `<p class="sheet-instr">Answer each part in complete sentences. A thesis is not required.</p>`
-      + stim
-      + qs.map((q,i)=>{
-          const parts = (q.parts||[]).map(p=>`<div class="q"><div class="q-num">${esc(p.label||'')})</div><div class="q-body"><p class="q-prompt">${esc(p.prompt)}</p><div class="q-lines">${Array.from({length:3}).map(()=>'<div class="wl"></div>').join('')}</div></div></div>`).join('');
-          return `<div class="exam-q"><div class="exam-q-head">Question ${i+1}${q.directions?` — <span>${esc(q.directions)}</span>`:''}</div>${parts}</div>`;
+      + items.map((it,i)=>{
+          const stim = (it.stimulus && it.stimulus.trim())
+            ? `<div class="src-excerpt">${esc(it.stimulus)}${it.stimulusSource?`<cite>— ${esc(it.stimulusSource)}</cite>`:''}</div>` : '';
+          const parts = it.parts.map(p=>`<div class="q"><div class="q-num">${esc(p.label||'')})</div><div class="q-body"><p class="q-prompt">${esc(p.prompt)}</p><div class="q-lines">${Array.from({length:3}).map(()=>'<div class="wl"></div>').join('')}</div></div></div>`).join('');
+          return `<div class="exam-q"><div class="exam-q-head">Question ${i+1}${it.directions?` — <span>${esc(it.directions)}</span>`:''}</div>${stim}${parts}</div>`;
         }).join('');
     const key = `<div class="answerkey hidden" id="answerkey">${akHead('Model Responses')}`
-      + qs.map((q,i)=>`<div class="ak-item"><span class="n">Question ${i+1}</span></div>`+(q.parts||[]).map(p=>`<div class="ak-item"><span class="ans">${esc(p.label||'')})</span> <span class="exp">${esc(p.sample||'—')}</span></div>`).join('')).join('')
+      + items.map((it,i)=>`<div class="ak-item"><span class="n">Question ${i+1}</span></div>`+it.parts.map(p=>`<div class="ak-item"><span class="ans">${esc(p.label||'')})</span> <span class="exp">${esc(p.sample||'—')}</span></div>`).join('')).join('')
       + `</div>`;
     return body+key;
   },
   _leq(d){
+    if(Array.isArray(d)){ const a=d; d=Object.assign({}, a[0]); d.prompts=a.flatMap(o=>Array.isArray(o.prompts)?o.prompts:(o.prompt?[o.prompt]:[])); }
     const prompts = d.prompts||[];
     const body = sheetHead('AP World History · Long-Essay Question', d.title||'Long-Essay Question')
       + `<p class="sheet-instr">${esc(d.directions||'Answer ONE of the following in a full essay with a defensible thesis, contextualization, specific evidence, and analysis.')}</p>`
@@ -966,6 +983,7 @@ const RENDER = {
     return body+key;
   },
   _dbq(d){
+    if(Array.isArray(d)){ const a=d; d=Object.assign({}, a[0]); d.documents=a.flatMap(o=>Array.isArray(o.documents)?o.documents:(o.document?[o.document]:[])); }
     const docs = d.documents||[];
     const body = sheetHead('AP World History · Document-Based Question', d.title||'Document-Based Question')
       + (d.prompt?`<div class="dbq-prompt"><span class="task-label">Prompt</span>${esc(d.prompt)}</div>`:'')
