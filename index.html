@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js"></script>
+<script src="documents.js"></script>
 
 <style>
 :root{
@@ -193,6 +194,9 @@ select.tinput{appearance:none; background-image:url("data:image/svg+xml;utf8,<sv
   background:var(--surface-2); border:1px solid var(--line); color:var(--ink-soft); transition:.15s;
 }
 .chip:hover{border-color:var(--ring); color:var(--ink)}
+.realdocs-label{display:flex; gap:9px; align-items:flex-start; font-size:12.5px; line-height:1.45; color:var(--ink-soft); cursor:pointer}
+.realdocs-label input{margin-top:2px; flex:none; accent-color:var(--exam)}
+.realdocs-label b{color:var(--ink); font-weight:600}
 
 /* material grid */
 .mat-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px}
@@ -327,6 +331,8 @@ select.tinput{appearance:none; background-image:url("data:image/svg+xml;utf8,<sv
 .doc-head{font-family:var(--font-ui); font-weight:700; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--tint); margin-bottom:5px}
 .doc-src{font-family:var(--font-ui); font-size:12px; color:var(--ink-soft); font-style:italic; margin-bottom:9px}
 .doc-body{font-size:15px; line-height:1.55}
+.doc-link{font-family:var(--font-ui); color:var(--tint); text-decoration:underline; font-style:normal}
+.authentic-note{font-family:var(--font-ui); font-size:12px; color:var(--vocab); font-weight:600; margin:0 0 16px}
 .rubric{border:1px solid var(--line); border-radius:8px; overflow:hidden; margin:0 0 16px}
 .rubric-row{display:grid; grid-template-columns:180px 1fr}
 .rubric-row:nth-child(odd){background:var(--surface-2)}
@@ -495,6 +501,16 @@ select.tinput{appearance:none; background-image:url("data:image/svg+xml;utf8,<sv
           <option value="leq">LEQ — Long Essay (with rubric)</option>
           <option value="dbq">DBQ — Document-Based (documents + rubric)</option>
         </select>
+        <div id="realDocsRow" hidden style="margin-top:10px">
+          <label class="realdocs-label">
+            <input type="checkbox" id="realDocs" />
+            <span>Use <b>real public-domain documents</b> — authentic, cited primary sources. The AI writes the prompt, rubric, and HIPP notes around them.</span>
+          </label>
+          <div id="realDocsUnitWrap" hidden style="margin-top:9px">
+            <label class="field-label" for="realDocsUnit" style="font-size:11.5px">Document set</label>
+            <select class="tinput" id="realDocsUnit"></select>
+          </div>
+        </div>
       </div>
       <div style="margin-top:12px">
         <label class="field-label" for="focus">Tell the generator what to analyze or emphasize <span style="font-weight:400;color:var(--ink-faint)">(optional)</span></label>
@@ -551,6 +567,12 @@ const LEVEL_TEXT = {
   rigor:'Full AP rigor: college-level phrasing, demands analysis and use of historical reasoning (causation, comparison, continuity & change).',
 };
 
+// The real-document bank lives in documents.js (window.DOC_BANK) so it can grow
+// to hundreds of entries without touching this file. Declared early so the
+// controls that read it (the unit picker) are safe.
+const DOC_BANK = window.DOC_BANK || {};
+const DOC_UNITS = Object.keys(DOC_BANK).filter(k => (DOC_BANK[k].documents||[]).length > 0);
+
 /* ---------------- state ---------------- */
 let state = {
   sourceMode:'paste',        // 'paste' | 'topic'
@@ -596,6 +618,11 @@ function selectType(key){
   $('#skillWrap').hidden = key!=='skills';
   $('#examWrap').hidden = key!=='exam';
   fillCounts();
+  syncRealDocsRow();
+}
+function syncRealDocsRow(){
+  const el = $('#realDocsRow');
+  if(el) el.hidden = !(state.type==='exam' && $('#examFormat').value==='dbq');
 }
 function fillCounts(){
   const m = MATERIALS[state.type];
@@ -611,7 +638,15 @@ function fillCounts(){
   $('#countLabel').textContent = 'How many ('+unit+')';
 }
 fillCounts();
-$('#examFormat').addEventListener('change', fillCounts);
+$('#examFormat').addEventListener('change', ()=>{ fillCounts(); syncRealDocsRow(); });
+syncRealDocsRow();
+// populate the real-documents unit picker + toggle it with the checkbox
+(function initRealDocs(){
+  const sel = $('#realDocsUnit');
+  if(sel) sel.innerHTML = DOC_UNITS.map(k=>`<option value="${k}">${DOC_BANK[k].label} · ${DOC_BANK[k].documents.length} docs</option>`).join('');
+  const cb = $('#realDocs');
+  if(cb) cb.addEventListener('change', ()=>{ const w=$('#realDocsUnitWrap'); if(w) w.hidden = !cb.checked; });
+})();
 
 /* ---------------- source mode ---------------- */
 $('#modePaste').addEventListener('click',()=>setMode('paste'));
@@ -710,6 +745,7 @@ const EXAM_SCHEMAS = {
   dbq:`{"format":"dbq","title":"DBQ title","prompt":"the DBQ prompt (e.g. Evaluate the extent to which ...)","directions":"one line of student directions","documents":[{"number":1,"source":"attribution: author, title, date, and type of source","content":"a short, historically plausible excerpt of 2-4 sentences","hippNote":"a sourcing (HIPP) note for the teacher"}],"rubric":[{"row":"Thesis / Claim (1 pt)","criteria":"..."},{"row":"Contextualization (1 pt)","criteria":"..."},{"row":"Evidence from Documents (2 pts)","criteria":"..."},{"row":"Evidence Beyond Documents (1 pt)","criteria":"..."},{"row":"Sourcing / HIPP (1 pt)","criteria":"..."},{"row":"Complexity (1 pt)","criteria":"..."}],"modelThesis":"a sample thesis","suggestedGroupings":["a way the documents can be grouped"],"outsideEvidence":["a relevant outside fact a student could bring in"]}`,
 };
 
+
 const KIND_TEXT = {
   textbook:'a textbook / AMSCO section',
   class:'the teacher’s own class material (notes, slides, or a handout)',
@@ -724,6 +760,23 @@ function buildPrompt(){
   const srcKind = $('#srcKind').value;
   const skill = $('#skillFocus').value;
   const examFormat = $('#examFormat').value;
+
+  // Real-documents DBQ: hand the model the fixed public-domain documents and ask
+  // it to build the prompt/rubric/notes AROUND them (never rewriting them).
+  if(state.type==='exam' && examFormat==='dbq' && $('#realDocs') && $('#realDocs').checked){
+    const unitKey = ($('#realDocsUnit') && $('#realDocsUnit').value) || DOC_UNITS[0];
+    const set = DOC_BANK[unitKey] || {label:'this unit', documents:[]};
+    const bank = set.documents;
+    const docsText = bank.map((d,i)=>`Document ${i+1} — Source: ${d.source}\n"${d.content}"`).join('\n\n');
+    return [
+      `You are helping a teaching assistant build an AP World History: Modern Document-Based Question (DBQ) for ${set.label}.`,
+      `Below are ${bank.length} REAL primary-source documents. They are FIXED — do NOT rewrite, shorten, translate, or invent any documents. Write the DBQ around these exact documents.`,
+      docsText,
+      focus ? `Teacher's focus: ${focus}.` : '',
+      `Respond with ONLY valid JSON in exactly this shape, no markdown or commentary:`,
+      `{"format":"dbq","title":"DBQ title","prompt":"a defensible DBQ prompt these documents can answer (e.g. Evaluate the extent to which ...)","directions":"one line of student directions","rubric":[{"row":"Thesis / Claim (1 pt)","criteria":"..."},{"row":"Contextualization (1 pt)","criteria":"..."},{"row":"Evidence from Documents (2 pts)","criteria":"..."},{"row":"Evidence Beyond Documents (1 pt)","criteria":"..."},{"row":"Sourcing / HIPP (1 pt)","criteria":"..."},{"row":"Complexity (1 pt)","criteria":"..."}],"modelThesis":"a sample thesis for this prompt","suggestedGroupings":["a way to group the documents by number"],"outsideEvidence":["a relevant outside fact a student could bring in"],"docNotes":[{"number":1,"hippNote":"a HIPP sourcing note (Historical situation / Intended audience / Purpose / Point of view) for that document"}]}`
+    ].filter(Boolean).join('\n\n');
+  }
 
   let srcBlock;
   if(state.sourceMode==='topic'){
@@ -776,14 +829,17 @@ function setBusy(b){
 setBusy(false);
 
 async function generate(refresh){
-  // validate source
-  if(state.sourceMode==='paste' && sourceEl.value.trim().length<40){
-    showState('err','Add some source text','Paste a reading (a paragraph or more), upload a file, or switch to "Name a section".');
-    return;
-  }
-  if(state.sourceMode==='topic' && $('#topic').value.trim().length<3){
-    showState('err','Name a section','Type a topic or section, e.g. "AMSCO Unit 2.2 — The Mongol Empire".');
-    return;
+  const realDbq = state.type==='exam' && $('#examFormat').value==='dbq' && $('#realDocs') && $('#realDocs').checked;
+  // validate source (skipped for the real-documents DBQ, which supplies its own documents)
+  if(!realDbq){
+    if(state.sourceMode==='paste' && sourceEl.value.trim().length<40){
+      showState('err','Add some source text','Paste a reading (a paragraph or more), upload a file, or switch to "Name a section".');
+      return;
+    }
+    if(state.sourceMode==='topic' && $('#topic').value.trim().length<3){
+      showState('err','Name a section','Type a topic or section, e.g. "AMSCO Unit 2.2 — The Mongol Empire".');
+      return;
+    }
   }
   const type = state.type;
   setBusy(true);
@@ -793,6 +849,15 @@ async function generate(refresh){
     const tier = (type==='quiz'||type==='worksheet'||type==='skills'||type==='exam') ? 'complex' : 'default';
     const text = await callGenerate(buildPrompt(), tier);
     const data = parseJson(text);
+    if(realDbq){
+      const unitKey = ($('#realDocsUnit') && $('#realDocsUnit').value) || DOC_UNITS[0];
+      const bank = (DOC_BANK[unitKey] && DOC_BANK[unitKey].documents) || [];
+      const notes = {};
+      (data.docNotes||[]).forEach(n=>{ if(n && n.number!=null) notes[n.number]=n.hippNote; });
+      data.format = 'dbq';
+      data.authentic = true;
+      data.documents = bank.map((d,i)=>({ number:i+1, source:d.source, content:d.content, url:d.url, hippNote: notes[i+1]||'' }));
+    }
     state.lastData = data; state.isExample=false; state.type=type; state.showAnswers=false;
     renderOutput(type, data, false);
   }catch(e){
@@ -988,7 +1053,8 @@ const RENDER = {
     const body = sheetHead('AP World History · Document-Based Question', d.title||'Document-Based Question')
       + (d.prompt?`<div class="dbq-prompt"><span class="task-label">Prompt</span>${esc(d.prompt)}</div>`:'')
       + `<p class="sheet-instr">${esc(d.directions||'Using the documents and your knowledge of world history, write an essay with a thesis, contextualization, evidence from the documents, sourcing, and outside evidence.')}</p>`
-      + docs.map((doc,i)=>`<div class="doc"><div class="doc-head">Document ${esc(doc.number||i+1)}</div><div class="doc-src">${esc(doc.source||'')}</div><div class="doc-body">${esc(doc.content||'')}</div></div>`).join('');
+      + (d.authentic?`<p class="authentic-note">✓ The documents below are authentic public-domain primary sources.</p>`:'')
+      + docs.map((doc,i)=>`<div class="doc"><div class="doc-head">Document ${esc(doc.number||i+1)}</div><div class="doc-src">${esc(doc.source||'')}${doc.url?` · <a class="doc-link" href="${esc(doc.url)}" target="_blank" rel="noopener">source</a>`:''}</div><div class="doc-body">${esc(doc.content||'')}</div></div>`).join('');
     const key = `<div class="answerkey hidden" id="answerkey">${akHead('Rubric & Teacher Notes')}`
       + rubricRows(d.rubric)
       + (d.modelThesis?`<div class="ak-item"><span class="n">Model thesis</span> <span class="exp">${esc(d.modelThesis)}</span></div>`:'')
