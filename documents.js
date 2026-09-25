@@ -14,7 +14,12 @@
 window.DOC_BANK = {
   unit1: {
     label: 'Unit 1 — The Global Tapestry (c. 1200–1450)',
-    documents: []
+    documents: [
+      { source: 'Magna Carta (1215), clauses 39–40, trans. Ernest F. Henderson, Select Historical Documents of the Middle Ages (London, 1892) — public domain.',
+        url: 'https://en.wikisource.org/wiki/Magna_Carta',
+        topic: 'Limits on royal power in Europe',
+        content: 'No freeman shall be taken or imprisoned or disseised or outlawed or exiled or in any wise destroyed, nor will we go upon him nor send upon him, except by the lawful judgment of his peers or by the law of the land. To no one will we sell, to no one will we refuse or delay, right or justice.' }
+    ]
   },
   unit2: {
     label: 'Unit 2 — Networks of Exchange (c. 1200–1450)',
@@ -79,14 +84,33 @@ window.DOC_BANK = {
   },
   unit7: {
     label: 'Unit 7 — Global Conflict (c. 1900–present)',
-    documents: []
+    documents: [
+      { source: 'Woodrow Wilson, “Fourteen Points,” address to a joint session of Congress, January 8, 1918.',
+        url: 'https://en.wikisource.org/wiki/Fourteen_Points',
+        topic: 'WWI aims & the postwar order',
+        content: 'Open covenants of peace, openly arrived at, after which there shall be no private international understandings of any kind but diplomacy shall proceed always frankly and in the public view.' }
+    ]
   },
   unit8: {
     label: 'Unit 8 — Cold War & Decolonization (c. 1900–present)',
-    documents: []
+    documents: [
+      { source: 'Universal Declaration of Human Rights, Article 1, adopted by the United Nations General Assembly, 1948.',
+        url: 'https://en.wikisource.org/wiki/Universal_Declaration_of_Human_Rights',
+        topic: 'Human rights & decolonization',
+        content: 'All human beings are born free and equal in dignity and rights. They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood.' },
+      { source: 'Harry S. Truman, Address before a Joint Session of Congress (the Truman Doctrine), March 12, 1947.',
+        url: 'https://en.wikisource.org/wiki/Truman_Doctrine',
+        topic: 'Early Cold War containment',
+        content: 'I believe that it must be the policy of the United States to support free peoples who are resisting attempted subjugation by armed minorities or by outside pressures.' }
+    ]
   },
   unit9: {
     label: 'Unit 9 — Globalization (c. 1900–present)',
-    documents: []
+    documents: [
+      { source: 'Rio Declaration on Environment and Development, Principle 4, UN Conference on Environment and Development, 1992.',
+        url: 'https://en.wikisource.org/wiki/Rio_Declaration_on_Environment_and_Development',
+        topic: 'Globalization & the environment',
+        content: 'Environmental protection shall constitute an integral part of the development process and cannot be considered in isolation from it.' }
+    ]
   }
 };
