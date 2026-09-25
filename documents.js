@@ -66,7 +66,11 @@ window.DOC_BANK = {
       { source: 'Declaration of the Rights of Man and of the Citizen, National Assembly of France, August 26, 1789 (Avalon Project, Yale Law School).',
         url: 'https://avalon.law.yale.edu/18th_century/rightsof.asp',
         topic: 'Enlightenment ideals & revolution',
-        content: 'Men are born and remain free and equal in rights. Social distinctions may be founded only upon the general good. The aim of all political association is the preservation of the natural and imprescriptible rights of man.' }
+        content: 'Men are born and remain free and equal in rights. Social distinctions may be founded only upon the general good. The aim of all political association is the preservation of the natural and imprescriptible rights of man.' },
+      { source: 'The unanimous Declaration of the thirteen united States of America (Declaration of Independence), July 4, 1776.',
+        url: 'https://en.wikisource.org/wiki/United_States_Declaration_of_Independence',
+        topic: 'Atlantic revolutions & natural rights',
+        content: 'We hold these truths to be self-evident, that all men are created equal, that they are endowed by their Creator with certain unalienable Rights, that among these are Life, Liberty and the pursuit of Happiness.—That to secure these rights, Governments are instituted among Men, deriving their just powers from the consent of the governed.' }
     ]
   },
   unit6: {
@@ -88,7 +92,15 @@ window.DOC_BANK = {
       { source: 'Woodrow Wilson, “Fourteen Points,” address to a joint session of Congress, January 8, 1918.',
         url: 'https://en.wikisource.org/wiki/Fourteen_Points',
         topic: 'WWI aims & the postwar order',
-        content: 'Open covenants of peace, openly arrived at, after which there shall be no private international understandings of any kind but diplomacy shall proceed always frankly and in the public view.' }
+        content: 'Open covenants of peace, openly arrived at, after which there shall be no private international understandings of any kind but diplomacy shall proceed always frankly and in the public view.' },
+      { source: 'Arthur Balfour, Foreign Secretary, letter to Lord Rothschild (the Balfour Declaration), November 2, 1917.',
+        url: 'https://en.wikisource.org/wiki/Balfour_Declaration',
+        topic: 'WWI-era diplomacy & its legacies',
+        content: 'His Majesty’s Government view with favour the establishment in Palestine of a national home for the Jewish people, and will use their best endeavours to facilitate the achievement of this object, it being clearly understood that nothing shall be done which may prejudice the civil and religious rights of existing non-Jewish communities in Palestine.' },
+      { source: 'The Atlantic Charter, joint declaration of Franklin D. Roosevelt and Winston Churchill, August 14, 1941.',
+        url: 'https://en.wikisource.org/wiki/Atlantic_Charter',
+        topic: 'WWII aims & self-determination',
+        content: 'Third, they respect the right of all peoples to choose the form of government under which they will live; and they wish to see sovereign rights and self government restored to those who have been forcibly deprived of them.' }
     ]
   },
   unit8: {
@@ -101,7 +113,11 @@ window.DOC_BANK = {
       { source: 'Harry S. Truman, Address before a Joint Session of Congress (the Truman Doctrine), March 12, 1947.',
         url: 'https://en.wikisource.org/wiki/Truman_Doctrine',
         topic: 'Early Cold War containment',
-        content: 'I believe that it must be the policy of the United States to support free peoples who are resisting attempted subjugation by armed minorities or by outside pressures.' }
+        content: 'I believe that it must be the policy of the United States to support free peoples who are resisting attempted subjugation by armed minorities or by outside pressures.' },
+      { source: 'Ho Chi Minh, Declaration of Independence of the Democratic Republic of Vietnam, September 2, 1945.',
+        url: 'https://en.wikisource.org/wiki/Declaration_of_Independence_of_the_Democratic_Republic_of_Vietnam',
+        topic: 'Decolonization & self-determination',
+        content: 'All the peoples on the Earth are equal from birth, all the peoples have a right to live, to be happy and to be free.' }
     ]
   },
   unit9: {
