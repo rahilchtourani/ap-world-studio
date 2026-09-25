@@ -31,7 +31,11 @@ window.DOC_BANK = {
       { source: 'Thomas Aquinas, Summa Theologica (c. 1274), trans. Fathers of the English Dominican Province (1920).',
         url: 'https://en.wikisource.org/wiki/Summa_Theologiae',
         topic: 'Religion & governance in Europe',
-        content: 'Law is nothing else than an ordinance of reason for the common good, made by him who has care of the community, and promulgated.' }
+        content: 'Law is nothing else than an ordinance of reason for the common good, made by him who has care of the community, and promulgated.' },
+      { source: 'Galbert of Bruges, “The Ceremony of Homage and Fealty” (1127), in F. A. Ogg, A Source Book of Medieval History (New York, 1907).',
+        url: 'https://sourcebooks.fordham.edu/source/1127galbert.asp',
+        topic: 'Feudalism in Europe',
+        content: 'The count asked the vassal if he was willing to become completely his man, and he answered, “I am willing”; and with clasped hands, placed between the hands of the count, they were bound together by a kiss.' }
     ]
   },
   unit2: {
@@ -69,7 +73,15 @@ window.DOC_BANK = {
       { source: 'Thomas Hobbes, Leviathan, Ch. 13 (1651).',
         url: 'https://en.wikisource.org/wiki/Leviathan',
         topic: 'Absolutism & state power',
-        content: 'During the time men live without a common power to keep them all in awe, they are in that condition which is called war; and such a war as is of every man against every man… and the life of man, solitary, poor, nasty, brutish, and short.' }
+        content: 'During the time men live without a common power to keep them all in awe, they are in that condition which is called war; and such a war as is of every man against every man… and the life of man, solitary, poor, nasty, brutish, and short.' },
+      { source: 'English Bill of Rights, 1689.',
+        url: 'https://en.wikisource.org/wiki/Bill_of_Rights_1689',
+        topic: 'Constitutional limits on monarchy in Europe',
+        content: 'That the pretended power of suspending of laws, or the execution of laws, by regal authority, without consent of Parliament, is illegal.' },
+      { source: 'Jacques-Bénigne Bossuet, Politics Drawn from the Very Words of Holy Scripture (1709), on the divine right of kings.',
+        url: 'https://en.wikipedia.org/wiki/Jacques-B%C3%A9nigne_Bossuet',
+        topic: 'Divine-right absolutism',
+        content: 'The royal power is absolute… The prince need render account of his conduct to no one but God. Kings are gods, and share in a manner the divine independence.' }
     ]
   },
   unit4: {
@@ -86,7 +98,15 @@ window.DOC_BANK = {
       { source: 'Adam Smith, The Wealth of Nations, Book IV, Ch. 7 (1776), on the discovery of America.',
         url: 'https://en.wikisource.org/wiki/The_Wealth_of_Nations',
         topic: 'Economic effects of transoceanic trade',
-        content: 'The discovery of America, and that of a passage to the East Indies by the Cape of Good Hope, are the two greatest and most important events recorded in the history of mankind.' }
+        content: 'The discovery of America, and that of a passage to the East Indies by the Cape of Good Hope, are the two greatest and most important events recorded in the history of mankind.' },
+      { source: 'Bernal Díaz del Castillo, The True History of the Conquest of New Spain (c. 1568), trans. A. P. Maudslay (1908–16), on first seeing Tenochtitlan.',
+        url: 'https://en.wikisource.org/wiki/The_Memoirs_of_the_Conquistador_Bernal_Diaz_del_Castillo',
+        topic: 'Encounter & conquest in the Americas',
+        content: 'We were amazed and said that it was like the enchantments they tell of in the legend of Amadis, on account of the great towers and cues and buildings rising from the water, and all built of masonry.' },
+      { source: 'The Requerimiento (1513), read by Spanish conquistadors to Indigenous peoples, in A. Helps, The Spanish Conquest in America (1900).',
+        url: 'https://en.wikipedia.org/wiki/Requerimiento',
+        topic: 'Justifications for conquest',
+        content: 'I certify to you that, with the help of God, we shall powerfully enter into your country, and shall make war against you, and shall take you and your wives and your children, and shall make slaves of them.' }
     ]
   },
   unit5: {
