@@ -35,7 +35,15 @@ window.DOC_BANK = {
       { source: 'Galbert of Bruges, “The Ceremony of Homage and Fealty” (1127), in F. A. Ogg, A Source Book of Medieval History (New York, 1907).',
         url: 'https://sourcebooks.fordham.edu/source/1127galbert.asp',
         topic: 'Feudalism in Europe',
-        content: 'The count asked the vassal if he was willing to become completely his man, and he answered, “I am willing”; and with clasped hands, placed between the hands of the count, they were bound together by a kiss.' }
+        content: 'The count asked the vassal if he was willing to become completely his man, and he answered, “I am willing”; and with clasped hands, placed between the hands of the count, they were bound together by a kiss.' },
+      { source: 'Ibn Battuta, Travels in Asia and Africa 1325–1354 (on Sultan Muhammad bin Tughluq of Delhi), trans. H. A. R. Gibb (1929).',
+        url: 'https://sourcebooks.fordham.edu/source/1354-ibnbattuta.asp',
+        topic: 'The Delhi Sultanate (South Asia)',
+        content: 'The Sultan was far too free in shedding blood. He used to punish small faults and great, without respect of persons, whether men of learning or piety or noble descent.' },
+      { source: 'Ibn Battuta, Travels in Asia and Africa 1325–1354 (on Cairo), trans. H. A. R. Gibb (1929).',
+        url: 'https://sourcebooks.fordham.edu/source/1354-ibnbattuta.asp',
+        topic: 'Dar al-Islam: a great Islamic metropolis',
+        content: 'Cairo, mother of cities and seat of Pharaoh the tyrant, mistress of broad regions and fruitful lands, boundless in multitude of buildings, peerless in beauty and splendour.' }
     ]
   },
   unit2: {
@@ -56,7 +64,11 @@ window.DOC_BANK = {
       { source: 'Giovanni Boccaccio, The Decameron (c. 1350), trans. J. M. Rigg (London, 1921).',
         url: 'https://sourcebooks.fordham.edu/source/boccacio2.asp',
         topic: 'Spread of the Black Death',
-        content: 'It had had its origin some years before in the East, whence, after destroying an innumerable multitude of living beings, it had propagated itself without respite from place to place, and so calamitously, had spread into the West.' }
+        content: 'It had had its origin some years before in the East, whence, after destroying an innumerable multitude of living beings, it had propagated itself without respite from place to place, and so calamitously, had spread into the West.' },
+      { source: 'Ibn Battuta, Travels in Asia and Africa 1325–1354 (on the port of Hormuz), trans. H. A. R. Gibb (1929).',
+        url: 'https://sourcebooks.fordham.edu/source/1354-ibnbattuta.asp',
+        topic: 'Indian Ocean trade entrepôts',
+        content: 'New Hormuz is a large and fine city, with busy markets, as it is the port from which the wares from India and Sind are despatched to the Iraqs, Fars, and Khurasan.' }
     ]
   },
   unit3: {
@@ -81,7 +93,15 @@ window.DOC_BANK = {
       { source: 'Jacques-Bénigne Bossuet, Politics Drawn from the Very Words of Holy Scripture (1709), on the divine right of kings.',
         url: 'https://en.wikipedia.org/wiki/Jacques-B%C3%A9nigne_Bossuet',
         topic: 'Divine-right absolutism',
-        content: 'The royal power is absolute… The prince need render account of his conduct to no one but God. Kings are gods, and share in a manner the divine independence.' }
+        content: 'The royal power is absolute… The prince need render account of his conduct to no one but God. Kings are gods, and share in a manner the divine independence.' },
+      { source: 'Abu’l-Fazl Allami, The Ain-i-Akbari, Vol. I (“The Nature of Royalty”), trans. H. Blochmann (Calcutta, 1873).',
+        url: 'https://archive.org/details/in.ernet.dli.2015.527127',
+        topic: 'Mughal kingship & legitimacy',
+        content: 'Royalty is a light emanating from God, and a ray from the sun, the illuminator of the universe.' },
+      { source: 'The Sacred Edict of the Kangxi Emperor (1670), Maxim 1 (Qing dynasty).',
+        url: 'https://archive.org/details/sacrededictconta00kangrich',
+        topic: 'Qing governance & Confucian orthodoxy',
+        content: 'Esteem most highly filial piety and brotherly submission, in order to give due importance to the social relations.' }
     ]
   },
   unit4: {
@@ -106,7 +126,15 @@ window.DOC_BANK = {
       { source: 'The Requerimiento (1513), read by Spanish conquistadors to Indigenous peoples, in A. Helps, The Spanish Conquest in America (1900).',
         url: 'https://en.wikipedia.org/wiki/Requerimiento',
         topic: 'Justifications for conquest',
-        content: 'I certify to you that, with the help of God, we shall powerfully enter into your country, and shall make war against you, and shall take you and your wives and your children, and shall make slaves of them.' }
+        content: 'I certify to you that, with the help of God, we shall powerfully enter into your country, and shall make war against you, and shall take you and your wives and your children, and shall make slaves of them.' },
+      { source: 'Bartolomé de las Casas, A Brief Account of the Destruction of the Indies (1552), trans. John Phillips (1656).',
+        url: 'https://www.gutenberg.org/ebooks/20321',
+        topic: 'Spanish cruelty toward Indigenous peoples',
+        content: 'They laid wagers among themselves, who should with a sword at one blow cut, or divide a man in two; or which of them should decollate or behead a man, with the greatest dexterity.' },
+      { source: 'Treaty of Tordesillas (1494), between Spain and Portugal, trans. in Blair & Robertson, The Philippine Islands, 1493–1898, Vol. I (1903).',
+        url: 'https://en.wikisource.org/wiki/The_Philippine_Islands,_1493-1898/Volume_1/Treaty_of_Tordesillas',
+        topic: 'Dividing the world: rival maritime empires',
+        content: 'A boundary or straight line be determined and drawn north and south, from pole to pole… at a distance of three hundred and seventy leagues west of the Cabo Verde islands.' }
     ]
   },
   unit5: {
