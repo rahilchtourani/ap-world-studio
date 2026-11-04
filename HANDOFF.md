@@ -12,8 +12,22 @@
 ## Current task: paragraph-length DBQ documents
 Rahil's requirements: **at least 7 documents per unit, each at least one realistic paragraph (aim for 120–250 words), cut verbatim from public-domain editions.** Each document is `{source, url, topic, content}`. Elide with "…" where needed, and fix only obvious OCR typos.
 
-**Done:** Units 1, 2 and 3 each have 8 paragraph documents, in the override blocks at the bottom of `documents.js`.
-**Left:** Units 4–9 still use the short excerpts. Add an override block `window.DOC_BANK.unitN = {label, documents:[…]}` for each one.
+**Done:** All nine units have 8 paragraph documents each (about 140–300 words), in the override blocks at the bottom of `documents.js`. Units 1–3 came first. Units 4–9 were added in November 2026.
+**Left:** Nothing required. The short-excerpt blocks at the top of `documents.js` are now fully overridden and could be deleted.
+
+### How Units 4–9 were sourced (cloud session, Nov 2026)
+That session's network allowed only GitHub, so texts came from GitHub-hosted copies of the same public-domain editions:
+- **Project Gutenberg texts** came via the GITenberg mirrors (`github.com/GITenberg/<Title>_<ID>`). Citation URLs still point to `gutenberg.org/ebooks/<ID>`.
+- **U.S. presidential speeches** came from the Miller Center corpus (`github.com/changwu/presidential-speeches`). Citation URLs point to millercenter.org.
+- **UN General Assembly speeches** (Nkrumah, Khrushchev and Sukarno in 1960; Shevardnadze 1988; Maldives 1990; Mandela 1994) came from the UN General Debate Corpus (`github.com/MafiAtUN/osaa-unga-analysis`). Citation URLs point to those exact files.
+- **Other texts:** the UDHR came from NLTK's `udhr` corpus, Nehru from the GUM corpus, Ho Chi Minh from OpenStax *World History* vol. 2 (CC BY), and the Millennium Declaration from `yuiseki/undocs`.
+Each excerpt was cut by exact start/end anchors, with "…" joining the cut pieces. Poems use " / " for line breaks and " // " for stanza breaks. These OCR or typesetting slips were corrected:
+- Bolívar: "coll"→"collapse", "mono"→"monopoly"
+- Keynes: "polities"→"politics"
+- NAFTA speech: "file basis"→"the basis"
+- Kennedy: "own' freedom"→"own freedom"
+- Sukarno and Shevardnadze: dash spacing
+- Nkrumah: "self- appointed"→"self-appointed"
 
 ### Method that works
 - Download full texts with `curl`. Python's SSL certificates are broken on this Mac, so use curl to fetch and Python only to parse. Use concurrency of about 4 and a User-Agent header. Wikisource returns 503 if you hit it with bursts.
@@ -31,6 +45,8 @@ Rahil's requirements: **at least 7 documents per unit, each at least one realist
 - **U7:** Wilson's Fourteen Points (Avalon wilson14.asp), League Covenant (Avalon leagcov.asp), Versailles Part VIII (Avalon imt/partviii.asp), Keynes, Economic Consequences of the Peace (Gutenberg 15776), Zimmermann Telegram, Owen's "Dulce et Decorum Est", the Balfour Declaration and Atlantic Charter (Avalon), FDR's Day of Infamy speech (Wikisource), Truman's Hiroshima statement (trumanlibrary.gov).
 - **U8:** Truman Doctrine (Avalon trudoc.asp), Kennan Long Telegram (nsarchive2.gwu.edu), Kennedy inaugural (Avalon kennedy.asp), Ho Chi Minh (Wikisource Vietnamese_Declaration_of_Independence), Nehru's Tryst with Destiny (Wikisource), UN Resolution 1514, UDHR (un.org).
 - **U9:** UN Charter (un.org full text), WHO Constitution, Rio Declaration, Millennium Declaration, Beijing Declaration (all on Wikisource), Schuman Declaration (Wikisource or europa.eu), Kyoto (unfccc.int kpeng.html), Reagan's Berlin Wall speech (Wikisource), Brundtland's Our Common Future.
+
+(Some of the leads above for Units 4–9 were used. Others weren't reachable and were replaced: Burke, Mazzini, Lin Zexu, Carnegie, the Versailles and Atlantic Charter texts, Kennan, Res. 1514, Rio, Kyoto and Brundtland. Brundtland is copyrighted anyway.)
 
 Rahil's own recent web uploads added short excerpts: Ibn Battuta on Cairo, Hormuz and Delhi, Ain-i-Akbari "Royalty is a light emanating from God," Las Casas, and Tordesillas. Consider lengthening these into paragraph versions where they fit.
 
