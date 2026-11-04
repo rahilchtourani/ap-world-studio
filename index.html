@@ -429,7 +429,7 @@ input[type=text].tinput,select.tinput,textarea.tinput{
   box-shadow:0 24px 46px -26px rgba(0,35,90,.55),0 0 0 6px rgba(255,255,255,.16);
   padding:var(--pad); font-family:var(--font);
 }
-.sheet::before{content:""; position:absolute; left:0; right:0; top:0; height:5px; background:linear-gradient(90deg,var(--tint,var(--primary)),var(--accent))}
+.sheet::before{content:""; position:absolute; z-index:2; left:0; right:0; top:0; height:5px; background:linear-gradient(90deg,var(--tint,var(--primary)),var(--accent))}
 .sheet-head{position:relative; margin:calc(var(--pad) * -1) calc(var(--pad) * -1) 26px; padding:calc(var(--pad) * .8 + 5px) var(--pad) 18px;
   background:linear-gradient(180deg,var(--tint-soft,var(--sel-a)) 0%,var(--sheet) 100%); border-bottom:2px solid var(--tint,var(--primary))}
 .sheet-head::after{content:""; position:absolute; left:0; right:0; top:5px; height:42%; background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,0)); pointer-events:none}
@@ -583,7 +583,7 @@ input[type=text].tinput,select.tinput,textarea.tinput{
   .sheet-head::after{display:none}
   .sheet-scroll{max-width:none}
   .sheet{border:none; box-shadow:none; padding:0; border-radius:0; color:#000; background:#fff}
-  .sheet::before{content:""; position:absolute; left:0; right:0; top:0; height:5px; background:linear-gradient(90deg,var(--tint,var(--primary)),var(--accent))}
+  .sheet::before{display:none}
   .sheet *{color:#000!important}
   .q-num{background:#000!important; color:#fff!important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
   .fc-front{background:#f2f2f2!important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
