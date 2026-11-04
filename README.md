@@ -53,6 +53,41 @@ make, and click **Generate**.
 
 ---
 
+## Before sharing with a class
+
+The site itself (Vercel) easily handles a whole class. The limit is the **Gemini
+quota on your one API key**. On the free tier Google allows only a handful of
+requests per minute and a daily cap (current numbers:
+[ai.google.dev/gemini-api/docs/rate-limits](https://ai.google.dev/gemini-api/docs/rate-limits)),
+so 30 students clicking Generate in the same minute will mostly be told to wait.
+
+1. **Turn on billing for the Google project that owns the API key.** This is the
+   single biggest fix. In [Google AI Studio](https://aistudio.google.com/apikey),
+   find your key's project and click **Set up billing** (or go to
+   Google Cloud Console → Billing and link a billing account to that project).
+   Paid-tier limits are far higher, and one Flash generation costs a tiny fraction
+   of a cent to about a cent ([pricing](https://ai.google.dev/gemini-api/docs/pricing)).
+2. **Set a budget alert or cap.** Google Cloud Console → Billing → **Budgets &
+   alerts** → Create budget (e.g. $10/month, alerts at 50% / 90% / 100%). You can
+   also lower per-minute quotas for the API under APIs & Services → Gemini API →
+   Quotas if you want a hard ceiling.
+3. **Share one link.** Your Vercel production URL (e.g.
+   `https://your-project.vercel.app`) stays the same across every redeploy, so
+   students can bookmark it once; you never need to send a new link after an
+   update. (Don't share the long per-deployment URLs with random letters in them.)
+
+Even without billing the site degrades gracefully: each click makes at most a few
+calls to Google, the page waits and retries automatically ("Lots of people are
+generating right now — retrying in Ns…"), and students see a clear "try again in
+N seconds" message instead of a raw error. To check this locally without using
+real quota, run `node scripts/loadtest.js` (it fires 40 concurrent requests at a
+fake Gemini).
+
+Optional Vercel environment variables: `GEMINI_MAX_ATTEMPTS` (default 4 upstream
+calls per click), `GEMINI_BUDGET_MS` (default 50000, must stay under the 60s
+`maxDuration` in `vercel.json`), `MAX_PROMPT_CHARS` (default 40000),
+`ALLOWED_ORIGINS` (extra sites allowed to call the API, comma-separated).
+
 ## Everyday notes
 
 - **Your key is safe.** It lives only in Vercel's Environment Variables, never in the
@@ -61,7 +96,8 @@ make, and click **Generate**.
   Environment Variables (then redeploy).
 - **Free-tier limits.** Google's free tier limits how often you can generate (roughly
   a few requests per minute). If you see a "hit the free-tier limit" message, wait a
-  minute and try again. Fine for one teacher; for heavy/shared use you'd add billing.
+  minute and try again. Fine for one teacher; for a class, see "Before sharing with
+  a class" above.
 - **Changing the model.** The function uses `gemini-3.6-flash`. To use a different
   Gemini model, add another Environment Variable in Vercel named `GEMINI_MODEL` with
   the model name as its value, then redeploy. No code change needed.
