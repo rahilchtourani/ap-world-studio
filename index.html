@@ -705,7 +705,7 @@ async function readFile(file){
 }
 
 /* ---------------- generation (calls our own server) ---------------- */
-async function callGenerate(prompt, tier){
+async function callGenerateOnce(prompt, tier){
   let r;
   try{
     r = await fetch('/api/generate', {
@@ -715,8 +715,35 @@ async function callGenerate(prompt, tier){
   }catch(_){ throw {code:'network'}; }
   let data = null;
   try{ data = await r.json(); }catch(_){}
-  if(!r.ok){ throw {code:'server', status:r.status, message:(data && data.error) || ('Error '+r.status)}; }
+  if(!r.ok){
+    let retryAfter = data && Number(data.retryAfter);
+    if(!(retryAfter>0)){ const h = Number(r.headers.get('retry-after')); retryAfter = h>0 ? h : 0; }
+    throw {code:'server', status:r.status, retryAfter, message:(data && data.error) || ('Error '+r.status)};
+  }
   return (data && data.text) || '';
+}
+// When the whole class clicks Generate at once, the shared Gemini quota runs out
+// for a bit. Busy answers (429/503, or a gateway timeout) are retried a few
+// times with jittered backoff, honoring the server's retryAfter.
+const GEN_RETRIES = 3, GEN_MAX_WAIT_S = 60;
+async function callGenerate(prompt, tier, onWait){
+  for(let attempt=0; ; attempt++){
+    try{ return await callGenerateOnce(prompt, tier); }
+    catch(e){
+      const busy = e && e.code==='server' && [429,502,503,504].includes(e.status);
+      if(!busy || attempt>=GEN_RETRIES) throw e;
+      if(e.retryAfter && e.retryAfter>GEN_MAX_WAIT_S) throw e; // e.g. daily quota used up
+      const baseS = e.retryAfter || Math.min(30, 4*Math.pow(2,attempt));
+      // jitter so 30 browsers don't all come back in the same second
+      let waitS = Math.ceil(baseS + Math.random()*Math.max(2, baseS*0.5));
+      while(waitS>0){
+        if(onWait) onWait(waitS, attempt+1, GEN_RETRIES);
+        await new Promise(r=>setTimeout(r,1000));
+        waitS--;
+      }
+      if(onWait) onWait(0, attempt+1, GEN_RETRIES);
+    }
+  }
 }
 function parseJson(text){
   if(text && typeof text==='object') return text;
@@ -847,7 +874,12 @@ async function generate(refresh){
 
   try{
     const tier = (type==='quiz'||type==='worksheet'||type==='skills'||type==='exam') ? 'complex' : 'default';
-    const text = await callGenerate(buildPrompt(), tier);
+    const loadTitle = 'Writing your '+MATERIALS[type].label.toLowerCase()+'…';
+    const text = await callGenerate(buildPrompt(), tier, (s, n, max)=>{
+      showState('load', loadTitle, s>0
+        ? 'Lots of people are generating right now — retrying in '+s+'s… (try '+(n+1)+' of '+(max+1)+')'
+        : 'Retrying now… This usually takes 10–30 seconds.');
+    });
     const data = parseJson(text);
     if(realDbq){
       const unitKey = ($('#realDocsUnit') && $('#realDocsUnit').value) || DOC_UNITS[0];
@@ -871,7 +903,11 @@ async function generate(refresh){
 function errCopy(e){
   const code = e && e.code;
   const m = (e && e.message) || '';
-  if(code==='server' && e.status===429) return {t:'Hit the free-tier limit',d:'Gemini’s free tier limits how often you can generate. Wait a minute, then try again.'};
+  if(code==='server' && (e.status===429 || e.status===503)){
+    const wait = e.retryAfter>0 ? (e.retryAfter>=120 ? 'later today' : 'in about '+Math.ceil(e.retryAfter)+' seconds') : 'in a minute';
+    return {t:'Lots of people are generating right now', d:'The shared AI quota is busy. Everything you entered is still here — click Generate again '+wait+'.'};
+  }
+  if(code==='server' && e.status===413) return {t:'That source is too long',d: m || 'Shorten the source and try again.'};
   if(/api[_ ]?key|api key|not valid|permission|unregistered|forbidden/i.test(m)) return {t:'API key problem',d:'Check that GEMINI_API_KEY is set correctly in your Vercel project settings, then redeploy and try again.'};
   switch(code){
     case 'network': return {t:'Couldn’t reach the generator',d:'Check your internet connection. If you just deployed, wait a moment and retry.'};
