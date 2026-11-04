@@ -43,6 +43,9 @@
   --title-fill:linear-gradient(180deg,#ffffff 0%,#ffffff 46%,#d3efff 54%,#ffffff 100%);
   --title-glow:drop-shadow(0 3px 14px rgba(0,70,160,.45));
   --sheet:#ffffff; --card-sheen:#ffffff;
+  --sheet-accent:#0a7fd4; --sheet-soft:#e6f3ff; --card-line:#c4e0f7;
+  --sheet-head:linear-gradient(180deg,#cfe9ff 0%,#eaf6ff 55%,#ffffff 100%);
+  --card-front:linear-gradient(180deg,#f7fcff 0%,#e1f1ff 100%);
   --flash:#ef7a12; --flash-soft:#fff0df;
   --work:#08a394; --work-soft:#dcf6f2;
   --quiz:#8a4ed8; --quiz-soft:#f1e8fd;
@@ -72,6 +75,9 @@
   --title-fill:linear-gradient(180deg,#fffaf0 0%,#ffffff 46%,#ffe1c4 54%,#fff7ec 100%);
   --title-glow:drop-shadow(0 3px 16px rgba(140,25,70,.55));
   --sheet:#fffdfb; --card-sheen:#ffffff;
+  --sheet-accent:#cf4a2c; --sheet-soft:#fff0e8; --card-line:#f6cfbd;
+  --sheet-head:linear-gradient(180deg,#ffdcca 0%,#fff1e8 55%,#fffdfb 100%);
+  --card-front:linear-gradient(180deg,#fffaf6 0%,#ffeadf 100%);
 }
 :root[data-theme="dark"]{
   --sky:linear-gradient(180deg,#010513 0%,#03173a 34%,#06305a 64%,#0a5466 100%);
@@ -93,6 +99,9 @@
   --title-fill:linear-gradient(180deg,#ffffff 0%,#e8f9ff 46%,#9ee3ff 54%,#e9fbff 100%);
   --title-glow:drop-shadow(0 0 22px rgba(60,200,255,.6));
   --sheet:#0c2036; --card-sheen:transparent;
+  --sheet-accent:#5cc8ff; --sheet-soft:rgba(80,190,255,.1); --card-line:rgba(120,200,255,.24);
+  --sheet-head:linear-gradient(180deg,rgba(70,180,255,.2) 0%,rgba(70,180,255,.06) 60%,rgba(70,180,255,0) 100%);
+  --card-front:linear-gradient(180deg,rgba(90,195,255,.16) 0%,rgba(90,195,255,.07) 100%);
   --flash:#ffa64f; --flash-soft:rgba(255,166,79,.13);
   --work:#3fe2cd; --work-soft:rgba(63,226,205,.12);
   --quiz:#bb8fff; --quiz-soft:rgba(187,143,255,.14);
@@ -401,13 +410,12 @@ input[type=text].tinput,select.tinput,textarea.tinput{
 .out-bar .sec small{font-size:inherit; font-style:normal; font-weight:800; color:var(--primary-deep); margin-left:2px}
 :root[data-theme="dark"] .out-bar .sec small{color:var(--ink)}
 .badge{
-  display:inline-grid; place-items:center; width:78px; height:78px; margin:-20px 0 -20px 8px; vertical-align:middle;
-  font-size:11px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:#fff; text-shadow:0 1px 1px rgba(150,50,0,.6);
-  background:radial-gradient(circle at 50% 35%,#fff0a0,#ffb21f 55%,#f0700a);
-  clip-path:polygon(100.0% 50.0%,90.2% 58.0%,96.2% 69.1%,84.1% 72.8%,85.4% 85.4%,72.8% 84.1%,69.1% 96.2%,58.0% 90.2%,50.0% 100.0%,42.0% 90.2%,30.9% 96.2%,27.2% 84.1%,14.6% 85.4%,15.9% 72.8%,3.8% 69.1%,9.8% 58.0%,0.0% 50.0%,9.8% 42.0%,3.8% 30.9%,15.9% 27.2%,14.6% 14.6%,27.2% 15.9%,30.9% 3.8%,42.0% 9.8%,50.0% 0.0%,58.0% 9.8%,69.1% 3.8%,72.8% 15.9%,85.4% 14.6%,84.1% 27.2%,96.2% 30.9%,90.2% 42.0%);
-  animation:wobble 4s ease-in-out infinite;
+  display:inline-flex; align-items:center; margin-left:10px; vertical-align:middle; position:relative; overflow:hidden;
+  padding:4px 11px 3px; border-radius:999px; font-size:10.5px; font-weight:900; letter-spacing:.12em; text-transform:uppercase;
+  color:#fff; text-shadow:0 1px 1px rgba(0,0,0,.3); border:1px solid var(--chip-border);
+  background:linear-gradient(180deg,var(--chip-a),var(--chip-b) 50%,var(--chip-c) 51%,var(--chip-d));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 3px 10px -3px rgba(0,60,140,.5);
 }
-@keyframes wobble{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(-4deg) scale(1.04)}}
 .out-actions{margin-left:auto; display:flex; gap:2px; flex-wrap:wrap; padding:4px; border-radius:16px; background:var(--field); border:1px solid var(--field-border); box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
 .obtn{
   display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700;
@@ -428,10 +436,11 @@ input[type=text].tinput,select.tinput,textarea.tinput{
   border:1px solid var(--glass-border);
   box-shadow:0 24px 46px -26px rgba(0,35,90,.55),0 0 0 6px rgba(255,255,255,.16);
   padding:var(--pad); font-family:var(--font);
+  --tint:var(--sheet-accent); --tint-soft:var(--sheet-soft);
 }
-.sheet::before{content:""; position:absolute; z-index:2; left:0; right:0; top:0; height:5px; background:linear-gradient(90deg,var(--tint,var(--primary)),var(--accent))}
+.sheet::before{content:""; position:absolute; z-index:2; left:0; right:0; top:0; height:5px; background:linear-gradient(90deg,var(--primary),var(--accent))}
 .sheet-head{position:relative; margin:calc(var(--pad) * -1) calc(var(--pad) * -1) 26px; padding:calc(var(--pad) * .8 + 5px) var(--pad) 18px;
-  background:linear-gradient(180deg,var(--tint-soft,var(--sel-a)) 0%,var(--sheet) 100%); border-bottom:2px solid var(--tint,var(--primary))}
+  background:var(--sheet-head); border-bottom:2px solid var(--tint,var(--primary))}
 .sheet-head::after{content:""; position:absolute; left:0; right:0; top:5px; height:42%; background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,0)); pointer-events:none}
 :root[data-theme="dark"] .sheet-head::after{background:linear-gradient(rgba(255,255,255,.06),rgba(255,255,255,0))}
 .sheet-head > *{position:relative; z-index:1}
@@ -460,8 +469,8 @@ input[type=text].tinput,select.tinput,textarea.tinput{
 
 /* flashcards */
 .cards{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-.fc{border:1px solid var(--line); border-radius:16px; overflow:hidden; break-inside:avoid; display:flex; flex-direction:column; min-height:130px}
-.fc-front{padding:13px 16px; font-weight:800; font-size:17px; line-height:1.25; color:var(--ink); background:linear-gradient(180deg,var(--card-sheen) -40%,var(--tint-soft) 100%); border-bottom:1px solid var(--tint)}
+.fc{border:1px solid var(--card-line); box-shadow:0 6px 14px -12px rgba(0,50,120,.45); border-radius:16px; overflow:hidden; break-inside:avoid; display:flex; flex-direction:column; min-height:130px}
+.fc-front{padding:13px 16px; font-weight:800; font-size:17px; line-height:1.25; color:var(--ink); background:var(--card-front); border-bottom:1px solid var(--card-line)}
 .fc-back{padding:12px 16px 14px; font-size:14.5px; line-height:1.55; color:var(--ink-soft); flex:1}
 .fc-tag{font-size:10px; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--tint); display:block; margin-bottom:4px}
 
